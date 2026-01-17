@@ -1,17 +1,47 @@
 "use client";
 
-import { X, Bookmark } from "lucide-react";
+import { useState } from "react";
+import { X, Bookmark, Trash2 } from "lucide-react";
 import type { WardrobeItem } from "@/lib/api/types";
 import { ATTRIBUTE_LABELS } from "@/lib/api/types";
+import { wardrobeService } from "@/lib/api/wardrobe";
+import { savedImagesService } from "@/lib/api/savedImages";
 
 interface EditImageModalProps {
   open: boolean;
   onClose: () => void;
   item: WardrobeItem | null;
+  onDelete?: (itemId: string) => void;
 }
 
-export default function EditImageModal({ open, onClose, item }: EditImageModalProps) {
+export default function EditImageModal({ open, onClose, item, onDelete }: EditImageModalProps) {
+
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState("");
+
   if (!open || !item) return null;
+
+  const handleDelete = async () => {
+    if (!item) return;
+
+    setIsDeleting(true);
+    try {
+      const response = await wardrobeService.deleteItem(item.id);
+      if (response.success) {
+        onDelete?.(item.id);
+        onClose();
+      }
+    } catch (error) {
+      console.error("Failed to delete item:", error);
+      alert("Failed to delete item. Please try again.");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return "";
@@ -75,11 +105,95 @@ export default function EditImageModal({ open, onClose, item }: EditImageModalPr
             Item Details
           </h3>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {item.saved ? (
+              <button
+                onClick={async () => {
+                  if (!item || !item.saved_image_id) return;
+                  setIsSaving(true);
+                  setSaveError("");
+                  setSaveSuccess(false);
+                  try {
+                    await savedImagesService.delete(item.saved_image_id);
+                    item.saved = false;
+                    item.saved_image_id = undefined;
+                    setSaveSuccess(false);
+                  } catch (err) {
+                    setSaveError("Failed to remove saved image");
+                  } finally {
+                    setIsSaving(false);
+                  }
+                }}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: isSaving ? "not-allowed" : "pointer",
+                  padding: 8,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: 6,
+                  color: "#22c55e",
+                  transition: "color 0.2s",
+                  opacity: isSaving ? 0.6 : 1,
+                }}
+                disabled={isSaving}
+                title="Remove from saved"
+              >
+                <Bookmark size={20} fill="#22c55e" />
+                {isSaving && (
+                  <span style={{ marginLeft: 8, fontSize: 12 }}>Removing...</span>
+                )}
+              </button>
+            ) : (
+              <button
+                onClick={async () => {
+                  if (!item) return;
+                  setIsSaving(true);
+                  setSaveError("");
+                  setSaveSuccess(false);
+                  try {
+                    await savedImagesService.saveImage({ image_id: item.id });
+                    item.saved = true;
+                    setSaveSuccess(true);
+                    setTimeout(() => setSaveSuccess(false), 1500);
+                  } catch (err) {
+                    setSaveError("Failed to save image");
+                  } finally {
+                    setIsSaving(false);
+                  }
+                }}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: isSaving ? "not-allowed" : "pointer",
+                  padding: 8,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: 6,
+                  color: saveSuccess ? "#22c55e" : "#666",
+                  transition: "color 0.2s",
+                  opacity: isSaving ? 0.6 : 1,
+                }}
+                disabled={isSaving}
+                onMouseEnter={(e) => (e.currentTarget.style.color = saveSuccess ? "#22c55e" : "#0095da")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = saveSuccess ? "#22c55e" : "#666")}
+                title={saveSuccess ? "Saved!" : "Save to outfits"}
+              >
+                <Bookmark size={20} />
+                {isSaving && (
+                  <span style={{ marginLeft: 8, fontSize: 12 }}>Saving...</span>
+                )}
+                {saveSuccess && (
+                  <span style={{ marginLeft: 8, fontSize: 12, color: "#22c55e" }}>Saved!</span>
+                )}
+              </button>
+            )}
+            {saveError && (
+              <span style={{ color: "#dc2626", fontSize: 12, marginLeft: 8 }}>{saveError}</span>
+            )}
             <button
-              onClick={() => {
-                // TODO: Implement save to saved outfits
-                alert("Saved to outfits!");
-              }}
+              onClick={() => setShowDeleteConfirm(true)}
               style={{
                 background: "none",
                 border: "none",
@@ -92,11 +206,11 @@ export default function EditImageModal({ open, onClose, item }: EditImageModalPr
                 color: "#666",
                 transition: "color 0.2s",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#0095da")}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#dc2626")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "#666")}
-              title="Save to outfits"
+              title="Delete item"
             >
-              <Bookmark size={20} />
+              <Trash2 size={20} />
             </button>
             <button
               onClick={onClose}
@@ -268,6 +382,75 @@ export default function EditImageModal({ open, onClose, item }: EditImageModalPr
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 1100,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(0,0,0,0.6)",
+          }}
+          onClick={() => setShowDeleteConfirm(false)}
+        >
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: 12,
+              padding: 24,
+              width: "100%",
+              maxWidth: 400,
+              boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h4 style={{ margin: "0 0 12px", fontSize: 18, fontWeight: 600, color: "#222" }}>
+              Delete Item
+            </h4>
+            <p style={{ margin: "0 0 24px", fontSize: 14, color: "#666" }}>
+              Are you sure you want to delete this item? This action cannot be undone.
+            </p>
+            <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: 8,
+                  border: "1px solid #ddd",
+                  background: "#fff",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  color: "#333",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: "#dc2626",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: isDeleting ? "not-allowed" : "pointer",
+                  color: "#fff",
+                  opacity: isDeleting ? 0.7 : 1,
+                }}
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

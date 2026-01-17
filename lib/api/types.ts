@@ -87,6 +87,36 @@ export interface WardrobeDeleteResponse {
 
 // ============ Category Groups ============
 
+// ============ Saved Images Types ============
+
+export interface SavedImage {
+  id: string;
+  user_id: string;
+  image_id: string;
+  note: string | null;
+  saved_at: string;
+}
+
+export interface SaveImageRequest {
+  image_id: string;
+  note?: string;
+}
+
+export interface SavedImageResponse {
+  id: string;
+  user_id: string;
+  image_id: string;
+  note: string | null;
+  saved_at: string;
+}
+
+export type SavedImageListResponse = SavedImage[];
+
+export interface UpdateNoteRequest {
+  saved_image_id: string;
+  note: string;
+}
+
 export const CATEGORY_GROUPS = {
   upperWear: ['T-Shirt', 'Shirt', 'Blouse', 'Sweater', 'Hoodie', 'Cardigan', 'Tank Top', 'Crop Top', 'Polo', 'Tunic'],
   bottomWear: ['Jeans', 'Trousers', 'Shorts', 'Skirt', 'Leggings', 'Joggers', 'Chinos', 'Culottes'],

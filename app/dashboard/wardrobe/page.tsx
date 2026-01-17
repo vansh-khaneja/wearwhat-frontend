@@ -51,6 +51,10 @@ export default function WardrobePage() {
     fetchItems();
   };
 
+  const handleDeleteItem = (itemId: string) => {
+    setItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
+  };
+
   const formatDate = (dateString?: string) => {
     if (!dateString) return "";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -80,6 +84,7 @@ export default function WardrobePage() {
         open={showEditModal}
         onClose={() => setShowEditModal(false)}
         item={selectedItem}
+        onDelete={handleDeleteItem}
       />
 
       <h1 className="text-3xl font-bold tracking-tight text-gray-900">

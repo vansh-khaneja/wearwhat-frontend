@@ -5,4 +5,5 @@
 export { apiClient } from './client';
 export { authService } from './auth';
 export { wardrobeService } from './wardrobe';
+export { savedImagesService } from './savedImages';
 export * from './types';
