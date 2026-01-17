@@ -101,11 +101,11 @@ export function TestimonialsSection() {
 				transition={{ duration: 0.6 }}
 			>
 				{/* Large quotation marks */}
-				<div className="text-center mb-8">
+				{/* <div className="text-center mb-8">
 					<div className="text-8xl md:text-9xl font-serif text-gray-200 leading-none mb-4">
 						&ldquo;
 					</div>
-				</div>
+				</div> */}
 
 				{/* Heading */}
 				<div className="text-center mb-4">

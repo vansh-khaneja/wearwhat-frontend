@@ -2,42 +2,11 @@ import React from "react";
 
 export default function TopBanner() {
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 200,
-      width: 'calc(100vw - 200px)',
-      background: '#0095da',
-      color: '#fff',
-      fontWeight: 600,
-      fontSize: 15,
-      padding: '6px 0',
-      textAlign: 'center',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 12,
-      borderRadius: 0,
-      margin: 0,
-      letterSpacing: 0.2,
-      zIndex: 0,
-      minHeight: '32px',
-      maxHeight: '38px',
-      boxShadow: '0 1px 4px rgba(0,149,218,0.08)',
-    }}>
+    <div className="fixed left-[200px] top-0 z-0 flex w-[calc(100vw-200px)] items-center justify-center gap-3 bg-black px-4 py-2 text-center text-sm font-semibold text-white shadow-md">
       <span>Unlock access to all features!</span>
-      <button style={{
-        background: '#fff',
-        color: '#0095da',
-        fontWeight: 600,
-        fontSize: 13,
-        border: 'none',
-        borderRadius: 8,
-        padding: '4px 14px',
-        cursor: 'pointer',
-        boxShadow: '0 1px 4px rgba(0,149,218,0.08)',
-        transition: 'background 0.15s, color 0.15s',
-      }}>Choose a plan</button>
+      <button className="cursor-pointer rounded-md bg-white px-3.5 py-1 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-200">
+        Choose a plan
+      </button>
     </div>
   );
 }

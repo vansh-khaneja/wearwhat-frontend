@@ -1,8 +1,9 @@
-
 "use client";
 
 import React from "react";
 import { FiSend } from "react-icons/fi";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 type Message = {
   from: 'bot' | 'user';
@@ -59,138 +60,65 @@ export default function StyleChatPage() {
   };
 
   return (
-    <div style={{
-      background: '#fafdff',
-      height: '100%',
-      fontFamily: 'Poppins, Arial, sans-serif',
-      padding: 0,
-      display: 'flex',
-      flexDirection: 'column',
-      overflow: 'hidden',
-    }}>
-      <h2 style={{ fontWeight: 700, fontSize: 28, margin: '0 0 32px 8px', color: '#222', letterSpacing: -1, flexShrink: 0 }}>StyleChat</h2>
-      <div style={{
-        flex: 1,
-        overflowY: 'auto',
-        marginRight: -32,
-        paddingRight: 32,
-      }}>
-        <div style={{
-          width: '100%',
-          maxWidth: 900,
-          margin: '0 auto',
-          padding: '0 0 24px 0',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 18
-        }}>
+    <div className="flex h-full flex-col overflow-hidden bg-gray-50">
+      <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+        StyleChat
+      </h1>
+      <div className="mt-8 flex-1 overflow-y-auto">
+        <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4">
           {messages.map((msg, i) => (
-            <div key={i} style={{
-              alignSelf: msg.from === 'user' ? 'flex-end' : 'flex-start',
-              background: msg.from === 'user' ? '#0095da' : '#fff',
-              color: msg.from === 'user' ? '#fff' : '#222',
-              borderRadius: msg.from === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-              padding: '13px 20px',
-              fontSize: 16,
-              maxWidth: 540,
-              boxShadow: msg.from === 'user' ? '0 2px 8px rgba(0,149,218,0.10)' : '0 1px 4px rgba(0,0,0,0.04)',
-              marginBottom: 2,
-              wordBreak: 'break-word',
-              border: msg.from === 'user' ? 'none' : '1.5px solid #e3eaf2',
-              position: 'relative',
-            }}>
-              {msg.text}
-              {msg.images && msg.images.length > 0 && (
-                <div style={{
-                  display: 'flex',
-                  gap: 10,
-                  marginTop: 12,
-                  flexWrap: 'wrap',
-                }}>
-                  {msg.images.map((img, idx) => (
-                    <img
-                      key={idx}
-                      src={img}
-                      alt="Outfit suggestion"
-                      style={{
-                        width: msg.images!.length === 1 ? 180 : 140,
-                        height: msg.images!.length === 1 ? 240 : 180,
-                        objectFit: 'cover',
-                        borderRadius: 12,
-                        border: '1px solid #e3eaf2',
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
+            <div
+              key={i}
+              className={`flex ${
+                msg.from === "user" ? "justify-end" : "justify-start"
+              }`}
+            >
+              <div
+                className={`max-w-lg rounded-2xl px-4 py-3 shadow-sm ${
+                  msg.from === "user"
+                    ? "rounded-br-none bg-gray-900 text-white"
+                    : "rounded-bl-none border border-gray-200 bg-white text-gray-800"
+                }`}
+              >
+                <p className="text-sm">{msg.text}</p>
+                {msg.images && (
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    {msg.images.map((img, idx) => (
+                      <img
+                        key={idx}
+                        src={img}
+                        alt="outfit suggestion"
+                        className="rounded-lg object-cover"
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           ))}
           <div ref={messagesEndRef} />
         </div>
       </div>
-      <form onSubmit={handleSend} style={{
-        width: '100%',
-        maxWidth: 900,
-        margin: '0 auto',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '24px 0 24px 0',
-        background: 'transparent',
-        border: 'none',
-        boxShadow: 'none',
-        flexShrink: 0,
-      }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          width: '100%',
-          maxWidth: 700,
-          background: '#fff',
-          borderRadius: 32,
-          boxShadow: '0 2px 16px rgba(0,0,0,0.07)',
-          padding: '0 12px 0 20px',
-          border: '1.5px solid #e3eaf2',
-          gap: 0,
-        }}>
-          <input
+      <div className="border-t border-gray-200 bg-white px-4 py-3">
+        <form
+          onSubmit={handleSend}
+          className="mx-auto flex max-w-3xl items-center gap-2"
+        >
+          <Input
             type="text"
+            placeholder="Ask StyleChat..."
             value={input}
-            onChange={e => setInput(e.target.value)}
-            placeholder="Type your message..."
-            style={{
-              flex: 1,
-              border: 'none',
-              outline: 'none',
-              fontSize: 17,
-              padding: '18px 0',
-              background: 'transparent',
-              color: '#222',
-              borderRadius: 32,
-            }}
+            onChange={(e) => setInput(e.target.value)}
+            className="flex-1 rounded-full border-gray-300 bg-gray-100 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-900"
           />
-          <button type="submit" style={{
-            background: '#0095da',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '50%',
-            width: 44,
-            height: 44,
-            marginLeft: 10,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 600,
-            fontSize: 22,
-            cursor: 'pointer',
-            boxShadow: '0 1px 4px rgba(0,149,218,0.10)',
-            transition: 'background 0.15s, color 0.15s',
-            outline: 'none',
-          }}>
-            <FiSend />
-          </button>
-        </div>
-      </form>
+          <Button
+            type="submit"
+            className="rounded-full bg-gray-900 p-2 text-white hover:bg-gray-800"
+          >
+            <FiSend className="h-5 w-5" />
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }

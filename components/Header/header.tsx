@@ -55,76 +55,29 @@ export function Header() {
     <header className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${
       isScrolled ? "bg-white shadow-md" : "bg-transparent"
     }`}>
-      <div className="container mx-auto px-4 lg:px-8 py-4">
+      <div className="container mx-auto px-4 lg:px-8 py-3 ">
         <nav className="flex items-center justify-between">
           <div className="flex items-center gap-4 sm:gap-8 lg:gap-12">
             {/* Logo */}
             <a href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200">
-              <Image 
+              {/* <Image 
                 src="/logo1.png" 
                 alt="WearWhat Logo" 
-                width={40} 
-                height={40} 
-                className="object-contain"
-              />
-              <span className="text-xl sm:text-2xl font-bold text-gray-900">
+                width={20} 
+                height={820} 
+                className="object-contain h-20 w-20"
+              /> */}
+              <span className="text-xl sm:text-2xl font-md tracking-wide text-gray-900">
                 WearWhat
               </span>
             </a>
 
             {/* Nav Links - Desktop */}
             <div className="hidden md:flex items-center gap-6 lg:gap-8">
-              <div className="relative" ref={featuresDropdownRef}>
-                <button 
-                  onClick={() => setShowFeaturesDropdown(!showFeaturesDropdown)}
-                  onMouseEnter={() => setShowFeaturesDropdown(true)}
-                  className="flex items-center gap-1 text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#0095da] focus:ring-offset-2 rounded px-2 py-1"
-                  aria-expanded={showFeaturesDropdown}
-                  aria-haspopup="true"
-                >
-                  Features
-                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showFeaturesDropdown ? 'rotate-180' : ''}`} />
-                </button>
-                {/* Features Dropdown */}
-                {showFeaturesDropdown && (
-                  <div 
-                    className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 animate-in fade-in slide-in-from-top-2 duration-200"
-                    onMouseLeave={() => setShowFeaturesDropdown(false)}
-                  >
-                    {features.map((feature) => (
-                      <a
-                        key={feature.name}
-                        href={feature.href}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#0095da] transition-colors duration-200"
-                        onClick={() => setShowFeaturesDropdown(false)}
-                      >
-                        {feature.name}
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <a 
-                href="/how-it-works" 
-                className="text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#0095da] focus:ring-offset-2 rounded px-2 py-1"
-              >
-                How it Works
-              </a>
-              <a 
-                href="#pricing" 
-                className="text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#0095da] focus:ring-offset-2 rounded px-2 py-1"
-              >
-                Pricing
-              </a>
-              <a 
-                href="#about" 
-                className="text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#0095da] focus:ring-offset-2 rounded px-2 py-1"
-              >
-                About
-              </a>
+              {/* This space is now empty as Features has been moved */}
             </div>
           </div>
-          {/* Auth Buttons - Desktop */}
+          {/* Auth Buttons & Features - Desktop */}
           <div className="hidden md:flex items-center gap-4">
             <a 
               href="/login" 
@@ -133,10 +86,40 @@ export function Header() {
               Sign in
             </a>
             <a href="/signup">
-              <Button className="bg-[#0095da] hover:bg-[#007ab8] text-white px-6 py-2.5 rounded-full font-semibold shadow-sm hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-200 focus:ring-[#0095da]">
+              <Button variant="ghost" className="text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#0095da] focus:ring-offset-2 rounded px-2 py-1">
                 Start free
               </Button>
             </a>
+            <div className="relative" ref={featuresDropdownRef}>
+              <button 
+                onClick={() => setShowFeaturesDropdown(!showFeaturesDropdown)}
+                onMouseEnter={() => setShowFeaturesDropdown(true)}
+                className="p-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#0095da] focus:ring-offset-2"
+                aria-expanded={showFeaturesDropdown}
+                aria-haspopup="true"
+                aria-label="Features menu"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+              {/* Features Dropdown */}
+              {showFeaturesDropdown && (
+                <div 
+                  className="absolute top-full right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 animate-in fade-in slide-in-from-top-2 duration-200"
+                  onMouseLeave={() => setShowFeaturesDropdown(false)}
+                >
+                  {features.map((feature) => (
+                    <a
+                      key={feature.name}
+                      href={feature.href}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#0095da] transition-colors duration-200"
+                      onClick={() => setShowFeaturesDropdown(false)}
+                    >
+                      {feature.name}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           {/* Mobile Menu Button */}
           <button
@@ -180,27 +163,7 @@ export function Header() {
                   ))}
                 </div>
               )}
-              <a 
-                href="/how-it-works" 
-                className="px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                How it Works
-              </a>
-              <a 
-                href="#pricing" 
-                className="px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Pricing
-              </a>
-              <a 
-                href="#about" 
-                className="px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                About
-              </a>
+              
               <div className="pt-2 border-t border-gray-200 mt-2 space-y-2">
                 <a 
                   href="/login" 

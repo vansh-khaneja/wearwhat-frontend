@@ -94,7 +94,7 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
         flexDirection: 'row',
         alignItems: 'stretch',
         justifyContent: 'center',
-        boxShadow: '0 8px 48px rgba(0,149,218,0.18)',
+        boxShadow: '0 8px 48px rgba(0,0,0,0.1)',
         border: 'none',
         padding: 0,
       }}>
@@ -131,7 +131,7 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
             style={{
               width: 320,
               minHeight: 160,
-              border: '2px dashed #0095da',
+              border: '2px dashed #1C1C1C',
               borderRadius: 14,
               background: '#f8fafd',
               display: 'flex',
@@ -143,7 +143,7 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
               position: 'relative',
               cursor: images.length < 9 && !isUploading ? 'pointer' : 'not-allowed',
               fontFamily: 'Poppins, Arial, sans-serif',
-              boxShadow: '0 2px 12px rgba(0,149,218,0.04)',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
               transition: 'border 0.2s',
               opacity: isUploading ? 0.6 : 1,
             }}
@@ -153,22 +153,22 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
             onDragOver={e => e.preventDefault()}
             onDrop={handleDrop}
           >
-            <div style={{ fontSize: 32, color: '#0095da', marginBottom: 0 }}>&uarr;</div>
+            <div style={{ fontSize: 32, color: '#1C1C1C', marginBottom: 0 }}>&uarr;</div>
             <div style={{ fontSize: 18, color: '#222', fontWeight: 500, marginBottom: 2 }}>Drag and Drop files here</div>
             <div style={{ color: '#888', fontSize: 15, marginBottom: 8 }}>or</div>
             <button
               type="button"
               style={{
                 background: '#fff',
-                color: '#0095da',
-                border: '2px solid #0095da',
+                color: '#1C1C1C',
+                border: '2px solid #1C1C1C',
                 borderRadius: 8,
                 fontFamily: 'Poppins, Arial, sans-serif',
                 fontWeight: 600,
                 fontSize: 16,
                 padding: '6px 24px',
                 cursor: images.length < 9 && !isUploading ? 'pointer' : 'not-allowed',
-                boxShadow: '0 1px 4px rgba(0,149,218,0.08)',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
                 marginBottom: 0,
                 outline: 'none',
                 transition: 'border 0.2s',
@@ -193,7 +193,7 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
             <button
               onClick={handleUpload}
               style={{
-                background: '#0095da',
+                background: '#1C1C1C',
                 color: '#fff',
                 border: 'none',
                 borderRadius: 8,
@@ -202,7 +202,7 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
                 fontSize: 16,
                 padding: '8px 24px',
                 cursor: images.length === 0 || isUploading ? 'not-allowed' : 'pointer',
-                boxShadow: '0 1px 4px rgba(0,149,218,0.08)',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
                 outline: 'none',
                 marginRight: 0,
                 transition: 'background 0.2s',
@@ -281,8 +281,8 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
                   height: 100,
                   borderRadius: 12,
                   overflow: 'hidden',
-                  boxShadow: '0 2px 8px rgba(0,149,218,0.10)',
-                  border: '1.5px solid #e0eaf3',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
+                  border: '1.5px solid #e0e0e0',
                   background: '#f8fafd',
                   display: 'flex',
                   alignItems: 'center',

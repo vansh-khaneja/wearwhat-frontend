@@ -11,13 +11,12 @@ export function ScrollingLogos() {
   ]
   const duplicatedItems = [...stats, ...stats]
   return (
-    <div className="w-full py-8 overflow-hidden" style={{ backgroundColor: '#1A181E' }}>
+    <div className="w-full py-8 overflow-hidden bg-[#1C1C1C]">
       <div className="flex animate-scroll whitespace-nowrap">
         {duplicatedItems.map((item, index) => (
           <div
             key={index}
-            className="inline-flex items-center justify-center mx-16 text-xl font-bold"
-            style={{ color: '#A1A0A2' }}
+            className="inline-flex items-center justify-center mx-16 text-xl font-bold text-gray-200"
           >
             {item}
           </div>

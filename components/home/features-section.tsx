@@ -30,11 +30,11 @@ export function FeaturesSection() {
 					viewport={{ once: true, amount: 0.3 }}
 					transition={{ duration: 0.6 }}
 				>
-					<div className="bg-[#1A1A1A] p-6 lg:p-10 flex flex-col justify-center">
-						<h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+					<div className="bg-gray-100 p-6 lg:p-10 flex flex-col justify-center">
+						<h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
 							Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 						</h2>
-						<p className="text-base text-gray-300">
+						<p className="text-base text-black">
 							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed auctor netus mauris velit vulputate lectus aliquam. Faucibus posuere at euismod.
 						</p>
 					</div>

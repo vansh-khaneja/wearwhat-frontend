@@ -5,6 +5,10 @@ import NewOutfitModal from "@/components/dashboard/NewOutfitModal";
 import EditImageModal from "@/components/dashboard/EditImageModal";
 import { wardrobeService } from "@/lib/api/wardrobe";
 import type { WardrobeItem } from "@/lib/api/types";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function WardrobePage() {
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -69,7 +73,7 @@ export default function WardrobePage() {
   });
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <main className="flex h-full flex-col overflow-hidden">
       <NewOutfitModal open={showUploadModal} onClose={handleUploadClose} />
       <EditImageModal
         open={showEditModal}
@@ -77,228 +81,110 @@ export default function WardrobePage() {
         item={selectedItem}
       />
 
-      <h2 style={{ fontWeight: 700, fontSize: 28, margin: "0 0 32px 8px", color: "#222", letterSpacing: -1, flexShrink: 0 }}>
+      <h1 className="text-3xl font-bold tracking-tight text-gray-900">
         Wardrobe
-      </h2>
+      </h1>
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 32px 0 0", gap: 18, flexShrink: 0 }}>
-        <div style={{ fontWeight: 500, fontSize: 18, color: "#555", marginLeft: 8 }}>
+      <div className="mt-8 flex items-center justify-between">
+        <p className="text-lg font-medium text-gray-600">
           {isLoading ? "Loading..." : `${filteredItems.length} Items`}
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <input
+        </p>
+        <div className="flex items-center gap-4">
+          <Input
             type="text"
             placeholder="Search items..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              padding: "8px 16px",
-              borderRadius: 8,
-              border: "1px solid #e3eaf2",
-              fontSize: 15,
-              outline: "none",
-              width: 220,
-              background: "#fff",
-              color: "#444",
-              boxShadow: "0 1px 3px rgba(0,149,218,0.03)",
-            }}
+            className="w-64 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
           />
-          <button
-            style={{
-              background: "#0095da",
-              color: "#fff",
-              fontWeight: 600,
-              fontSize: 13,
-              border: "none",
-              borderRadius: 6,
-              padding: "5px 12px",
-              cursor: "pointer",
-              boxShadow: "0 1px 3px rgba(0,149,218,0.07)",
-              transition: "background 0.15s, color 0.15s",
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-            }}
+          <Button
             onClick={() => setShowUploadModal(true)}
+            className="flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-gray-800"
           >
-            <span style={{ fontSize: 15, fontWeight: 700 }}>+</span>
-            <span style={{ fontSize: 13 }}>New Outfit</span>
-          </button>
+            <span className="text-lg font-bold">+</span>
+            <span>New Outfit</span>
+          </Button>
         </div>
       </div>
 
       {/* Error State */}
       {error && (
-        <div style={{ margin: "20px 8px", padding: 16, background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, color: "#dc2626" }}>
-          {error}
-          <button
-            onClick={fetchItems}
-            style={{ marginLeft: 12, background: "#dc2626", color: "#fff", border: "none", padding: "4px 12px", borderRadius: 4, cursor: "pointer" }}
-          >
-            Retry
-          </button>
-        </div>
+        <Alert variant="destructive" className="my-5">
+          <AlertDescription className="flex items-center justify-between">
+            {error}
+            <Button onClick={fetchItems} variant="destructive">
+              Retry
+            </Button>
+          </AlertDescription>
+        </Alert>
       )}
 
       {/* Loading State */}
       {isLoading && (
-        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "#888" }}>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ width: 40, height: 40, border: "3px solid #e3eaf2", borderTopColor: "#0095da", borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto 12px" }} />
-            Loading your wardrobe...
-          </div>
-        </div>
-      )}
-
-      {/* Empty State */}
-      {!isLoading && !error && items.length === 0 && (
-        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "#888" }}>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>👕</div>
-            <div style={{ fontSize: 18, fontWeight: 500, marginBottom: 8 }}>Your wardrobe is empty</div>
-            <div style={{ fontSize: 14, color: "#aaa", marginBottom: 20 }}>Upload your first outfit to get started</div>
-            <button
-              onClick={() => setShowUploadModal(true)}
-              style={{
-                background: "#0095da",
-                color: "#fff",
-                fontWeight: 600,
-                fontSize: 14,
-                border: "none",
-                borderRadius: 8,
-                padding: "10px 20px",
-                cursor: "pointer",
-              }}
-            >
-              + Add Items
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Items Grid */}
-      {!isLoading && !error && filteredItems.length > 0 && (
-        <div style={{ flex: 1, overflowY: "auto", marginTop: 12, marginRight: -32, paddingRight: 32 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 24, paddingBottom: 24 }}>
-            {filteredItems.map((item) => (
-              <div
-                key={item.id}
-                style={{
-                  position: "relative",
-                  width: "100%",
-                  aspectRatio: "3/5",
-                  height: 220,
-                  overflow: "hidden",
-                  cursor: "pointer",
-                }}
-                onClick={() => handleEditClick(item)}
-                onMouseEnter={(e) => {
-                  const overlay = e.currentTarget.querySelector(".img-overlay") as HTMLElement | null;
-                  if (overlay) overlay.style.opacity = "1";
-                }}
-                onMouseLeave={(e) => {
-                  const overlay = e.currentTarget.querySelector(".img-overlay") as HTMLElement | null;
-                  if (overlay) overlay.style.opacity = "0";
-                }}
-              >
-                <div
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: "#f7f7f7",
-                    padding: 12,
-                    boxSizing: "border-box",
-                    borderRadius: 0,
-                    boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
-                  }}
-                >
-                  <img
-                    src={item.image_url}
-                    alt={item.category}
-                    style={{
-                      maxWidth: "100%",
-                      maxHeight: "100%",
-                      objectFit: "contain",
-                      borderRadius: 0,
-                      background: "transparent",
-                      display: "block",
-                    }}
-                  />
-                  {/* Overlay for hover */}
-                  <div
-                    className="img-overlay"
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      height: "100%",
-                      background: "rgba(0,0,0,0.55)",
-                      opacity: 0,
-                      transition: "opacity 0.2s",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      pointerEvents: "none",
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: "#fff",
-                        fontSize: 14,
-                        fontWeight: 500,
-                        textDecoration: "underline",
-                        letterSpacing: 0.1,
-                        background: "transparent",
-                        padding: "0 10px",
-                        borderRadius: 4,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                        marginBottom: 6,
-                      }}
-                    >
-                      <svg width="15" height="15" fill="none" stroke="#fff" strokeWidth="2" viewBox="0 0 24 24" style={{ marginRight: 2 }}>
-                        <path d="M12 20h9" />
-                        <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-                      </svg>
-                      Edit
-                    </span>
-                    <span
-                      style={{
-                        position: "absolute",
-                        right: 10,
-                        bottom: 10,
-                        color: "rgba(255,255,255,0.45)",
-                        fontSize: 11,
-                        fontWeight: 400,
-                        letterSpacing: 0.1,
-                        pointerEvents: "none",
-                        userSelect: "none",
-                      }}
-                    >
-                      {formatDate(item.created_at)}
-                    </span>
-                  </div>
-                </div>
+        <div className="mt-4 flex-1 overflow-y-auto">
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            {Array.from({ length: 12 }).map((_, index) => (
+              <div key={index} className="group relative">
+                <Skeleton className="aspect-[3/5] w-full rounded-lg" />
+                <Skeleton className="mt-2 h-4 w-3/4 rounded" />
+                <Skeleton className="mt-1 h-3 w-1/2 rounded" />
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* CSS for spinner animation */}
-      <style jsx>{`
-        @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
-        }
-      `}</style>
-    </div>
+      {/* Empty State */}
+      {!isLoading && !error && items.length === 0 && (
+        <div className="flex flex-1 items-center justify-center text-center text-gray-500">
+          <div>
+            <div className="mb-4 text-5xl">👕</div>
+            <h3 className="mb-2 text-xl font-semibold">
+              Your wardrobe is empty
+            </h3>
+            <p className="mb-6 text-sm text-gray-400">
+              Upload your first outfit to get started
+            </p>
+            <Button
+              onClick={() => setShowUploadModal(true)}
+              className="rounded-lg bg-gray-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-gray-800"
+            >
+              + Add Items
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Items Grid */}
+      {!isLoading && !error && filteredItems.length > 0 && (
+        <div className="mt-4 flex-1 overflow-y-auto">
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            {filteredItems.map((item) => (
+              <div
+                key={item.id}
+                className="group relative w-full cursor-pointer"
+                onClick={() => handleEditClick(item)}
+              >
+                <div className="aspect-[3/5] w-full overflow-hidden rounded-lg bg-gray-100">
+                  <img
+                    src={item.imageUrl}
+                    alt={item.category}
+                    className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+                <div className="mt-2">
+                  <h3 className="text-sm font-medium text-gray-800">
+                    {item.category}
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    {formatDate(item.lastWorn)}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </main>
   );
 }

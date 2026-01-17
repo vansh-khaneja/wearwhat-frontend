@@ -8,7 +8,7 @@ export function Footer() {
         <div className="grid lg:grid-cols-2">
           <div className="px-12 py-16 flex flex-col justify-between bg-cover bg-center" style={{ backgroundImage: "url('/clothes-hanging.jpeg')" }}>
             <div>
-              <div className="w-16 h-16 mb-8">
+              {/* <div className="w-16 h-16 mb-8">
                 <Image 
                   src="/logo1.png" 
                   alt="WearWhat Logo" 
@@ -16,7 +16,7 @@ export function Footer() {
                   height={64} 
                   className="object-contain"
                 />
-              </div>
+              </div> */}
               <h2 className="text-5xl font-light leading-tight max-w-sm">
                 Find out about the sales at your local shop
               </h2>

@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
-import { useAuth } from "@/lib/context";
+import { useAuth } from "@/lib/context/AuthContext";
+import { Header } from "@/components/Header/header";
+import { Footer } from "@/components/Footer/footer";
+import { Button } from "@/components/ui/button";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -81,168 +84,172 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#0095da] px-4 py-8">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          {/* Logo */}
-          <div className="flex items-center gap-2 mb-6">
-            <Image src="/logo.png" alt="WearWhat Logo" width={32} height={32} className="object-contain" />
-            <span className="text-xl font-bold text-gray-900">WearWhat</span>
+    <div className="bg-gray-50">
+      <Header />
+      <main className="min-h-screen flex flex-col items-center justify-center pt-24 pb-12 px-4">
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-lg shadow-lg p-8">
+            {/* Logo */}
+            <div className="flex items-center gap-2 mb-6">
+              <Image src="/logo.png" alt="WearWhat Logo" width={32} height={32} className="object-contain" />
+              <span className="text-xl font-bold text-gray-900">WearWhat</span>
+            </div>
+
+            {/* Heading */}
+            <h1 className="text-2xl font-semibold text-gray-900 mb-6">
+              Create your account
+            </h1>
+
+            {/* API Error Message */}
+            {apiError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg">
+                {apiError}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Name fields */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="firstName" className="block text-sm text-gray-600 mb-1.5">
+                    First name
+                  </label>
+                  <input
+                    id="firstName"
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className={`w-full px-4 py-3 text-gray-900 placeholder-gray-400 bg-gray-50 border rounded-lg focus:outline-none focus:border-black focus:bg-white transition-colors ${
+                      errors.firstName ? "border-red-400" : "border-gray-200"
+                    }`}
+                  />
+                  {errors.firstName && (
+                    <p className="mt-1 text-xs text-red-500">{errors.firstName}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="lastName" className="block text-sm text-gray-600 mb-1.5">
+                    Last name
+                  </label>
+                  <input
+                    id="lastName"
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className={`w-full px-4 py-3 text-gray-900 placeholder-gray-400 bg-gray-50 border rounded-lg focus:outline-none focus:border-black focus:bg-white transition-colors ${
+                      errors.lastName ? "border-red-400" : "border-gray-200"
+                    }`}
+                  />
+                  {errors.lastName && (
+                    <p className="mt-1 text-xs text-red-500">{errors.lastName}</p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="email" className="block text-sm text-gray-600 mb-1.5">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className={`w-full px-4 py-3 text-gray-900 placeholder-gray-400 bg-gray-50 border rounded-lg focus:outline-none focus:border-black focus:bg-white transition-colors ${
+                    errors.email ? "border-red-400" : "border-gray-200"
+                  }`}
+                />
+                {errors.email && (
+                  <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm text-gray-600 mb-1.5">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Min 8 characters"
+                    className={`w-full px-4 py-3 pr-11 text-gray-900 placeholder-gray-400 bg-gray-50 border rounded-lg focus:outline-none focus:border-black focus:bg-white transition-colors ${
+                      errors.password ? "border-red-400" : "border-gray-200"
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="mt-1 text-xs text-red-500">{errors.password}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm text-gray-600 mb-1.5">
+                  Confirm password
+                </label>
+                <div className="relative">
+                  <input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Re-enter your password"
+                    className={`w-full px-4 py-3 pr-11 text-gray-900 placeholder-gray-400 bg-gray-50 border rounded-lg focus:outline-none focus:border-black focus:bg-white transition-colors ${
+                      errors.confirmPassword ? "border-red-400" : "border-gray-200"
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <p className="mt-1 text-xs text-red-500">{errors.confirmPassword}</p>
+                )}
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-black text-white hover:bg-gray-800 py-3 rounded-lg font-semibold transition-all disabled:opacity-50"
+              >
+                {isLoading ? "Creating account..." : "Get started"}
+              </Button>
+            </form>
+
+            {/* Terms */}
+            <p className="text-xs text-gray-500 mt-6 text-center">
+              By continuing, you agree to our{" "}
+              <Link href="/terms" className="underline hover:text-gray-700">Terms of Use</Link>
+              {" "}and{" "}
+              <Link href="/privacy" className="underline hover:text-gray-700">Privacy Policy</Link>.
+            </p>
           </div>
 
-          {/* Heading */}
-          <h1 className="text-2xl font-semibold text-gray-900 mb-6">
-            Create your account
-          </h1>
-
-          {/* API Error Message */}
-          {apiError && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg">
-              {apiError}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Name fields */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label htmlFor="firstName" className="block text-sm text-gray-600 mb-1.5">
-                  First name
-                </label>
-                <input
-                  id="firstName"
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className={`w-full px-4 py-3 text-gray-900 placeholder-gray-400 bg-gray-50 border rounded-lg focus:outline-none focus:border-[#0095da] focus:bg-white transition-colors ${
-                    errors.firstName ? "border-red-400" : "border-gray-200"
-                  }`}
-                />
-                {errors.firstName && (
-                  <p className="mt-1 text-xs text-red-500">{errors.firstName}</p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="lastName" className="block text-sm text-gray-600 mb-1.5">
-                  Last name
-                </label>
-                <input
-                  id="lastName"
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className={`w-full px-4 py-3 text-gray-900 placeholder-gray-400 bg-gray-50 border rounded-lg focus:outline-none focus:border-[#0095da] focus:bg-white transition-colors ${
-                    errors.lastName ? "border-red-400" : "border-gray-200"
-                  }`}
-                />
-                {errors.lastName && (
-                  <p className="mt-1 text-xs text-red-500">{errors.lastName}</p>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm text-gray-600 mb-1.5">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className={`w-full px-4 py-3 text-gray-900 placeholder-gray-400 bg-gray-50 border rounded-lg focus:outline-none focus:border-[#0095da] focus:bg-white transition-colors ${
-                  errors.email ? "border-red-400" : "border-gray-200"
-                }`}
-              />
-              {errors.email && (
-                <p className="mt-1 text-xs text-red-500">{errors.email}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm text-gray-600 mb-1.5">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min 8 characters"
-                  className={`w-full px-4 py-3 pr-11 text-gray-900 placeholder-gray-400 bg-gray-50 border rounded-lg focus:outline-none focus:border-[#0095da] focus:bg-white transition-colors ${
-                    errors.password ? "border-red-400" : "border-gray-200"
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="mt-1 text-xs text-red-500">{errors.password}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm text-gray-600 mb-1.5">
-                Confirm password
-              </label>
-              <div className="relative">
-                <input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Re-enter your password"
-                  className={`w-full px-4 py-3 pr-11 text-gray-900 placeholder-gray-400 bg-gray-50 border rounded-lg focus:outline-none focus:border-[#0095da] focus:bg-white transition-colors ${
-                    errors.confirmPassword ? "border-red-400" : "border-gray-200"
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                >
-                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
-              {errors.confirmPassword && (
-                <p className="mt-1 text-xs text-red-500">{errors.confirmPassword}</p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-[#0095da] text-white py-3 rounded-lg font-medium hover:bg-[#0080c0] transition-colors disabled:opacity-50"
-            >
-              {isLoading ? "Creating account..." : "Get started"}
-            </button>
-          </form>
-
-          {/* Terms */}
-          <p className="text-xs text-gray-500 mt-6 text-center">
-            By continuing, you agree to our{" "}
-            <Link href="/terms" className="underline hover:text-gray-700">Terms of Use</Link>
-            {" "}and{" "}
-            <Link href="/privacy" className="underline hover:text-gray-700">Privacy Policy</Link>.
+          {/* Sign in link */}
+          <p className="text-center text-gray-600 mt-6">
+            Already a member?{" "}
+            <Link href="/login" className="underline font-medium text-black hover:text-gray-800">
+              Log in
+            </Link>
           </p>
         </div>
-
-        {/* Sign in link */}
-        <p className="text-center text-white mt-6">
-          Already a member?{" "}
-          <Link href="/login" className="underline font-medium hover:text-white/90">
-            Log in
-          </Link>
-        </p>
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }

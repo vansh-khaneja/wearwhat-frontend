@@ -20,7 +20,7 @@ export default function Page() {
       ></div>
       <div className="relative z-10">
         <Header />
-        <main className="min-h-screen overflow-x-hidden w-full pt-20">
+        <main className="min-h-screen w-full pt-20">
           <div className="flex min-h-[calc(100vh-80px)] w-full relative">
             <div className="w-1/2 flex items-center justify-start pl-8 lg:pl-12 pr-0 relative z-30">
               <HeroSection />
