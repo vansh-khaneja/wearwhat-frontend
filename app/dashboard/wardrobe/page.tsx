@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { SquarePen } from "lucide-react";
 
 export default function WardrobePage() {
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -125,9 +126,7 @@ export default function WardrobePage() {
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {Array.from({ length: 12 }).map((_, index) => (
               <div key={index} className="group relative">
-                <Skeleton className="aspect-[3/5] w-full rounded-lg" />
-                <Skeleton className="mt-2 h-4 w-3/4 rounded" />
-                <Skeleton className="mt-1 h-3 w-1/2 rounded" />
+                <Skeleton className="aspect-square w-full rounded-lg" />
               </div>
             ))}
           </div>
@@ -165,20 +164,25 @@ export default function WardrobePage() {
                 className="group relative w-full cursor-pointer"
                 onClick={() => handleEditClick(item)}
               >
-                <div className="aspect-[3/5] w-full overflow-hidden rounded-lg bg-gray-100">
+                <div className="aspect-square w-full overflow-hidden rounded-lg bg-white relative">
                   <img
-                    src={item.imageUrl}
+                    src={item.image_url}
                     alt={item.category}
-                    className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                    className="h-full w-full object-contain object-center transition-transform duration-300 group-hover:scale-105"
                   />
-                </div>
-                <div className="mt-2">
-                  <h3 className="text-sm font-medium text-gray-800">
-                    {item.category}
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    {formatDate(item.lastWorn)}
-                  </p>
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <div className="flex items-center gap-2 text-white">
+                      <SquarePen className="w-5 h-5" />
+                      <span className="text-sm font-medium">Edit</span>
+                    </div>
+                  </div>
+                  {/* Date in bottom right */}
+                  {item.created_at && (
+                    <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      {formatDate(item.created_at)}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
 import { Header } from "@/components/Header/header";
@@ -42,9 +41,8 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           <div className="bg-white rounded-lg shadow-lg p-8">
             {/* Logo */}
-            <div className="flex items-center gap-2 mb-6">
-              <Image src="/logo.png" alt="WearWhat Logo" width={32} height={32} className="object-contain" />
-              <span className="text-xl font-semibold text-gray-800">WearWhat</span>
+            <div className="flex items-center mb-6">
+              <span className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'var(--font-poppins)' }}>WearWhat</span>
             </div>
 
             {/* Heading */}

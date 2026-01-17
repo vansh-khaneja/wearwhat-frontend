@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { FiBookmark } from "react-icons/fi";
+import { Bookmark, SquarePen } from "lucide-react";
 
 const outfitImages = [
   "083b5947-291e-4f39-addf-f823019d22a0.jpg",
@@ -16,21 +16,29 @@ export default function SavedPage() {
         Saved Outfits
       </h1>
       <div className="mt-8 flex-1 overflow-y-auto">
-        <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
           {outfitImages.map((img) => (
             <div
               key={img}
               className="group relative w-full cursor-pointer"
             >
-              <div className="aspect-[3/5] w-full overflow-hidden rounded-lg bg-gray-100">
+              <div className="aspect-square w-full overflow-hidden rounded-lg bg-white relative">
                 <img
                   src={`/outfits/${img}`}
                   alt="saved outfit"
-                  className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                  className="h-full w-full object-contain object-center transition-transform duration-300 group-hover:scale-105"
                 />
-              </div>
-              <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black bg-opacity-50 opacity-0 transition-opacity group-hover:opacity-100">
-                <FiBookmark className="h-8 w-8 text-white" />
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <div className="flex items-center gap-2 text-white">
+                    <SquarePen className="w-5 h-5" />
+                    <span className="text-sm font-medium">Edit</span>
+                  </div>
+                </div>
+                {/* Save icon in top right */}
+                <div className="absolute top-2 right-2 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <Bookmark className="w-5 h-5" fill="white" />
+                </div>
               </div>
             </div>
           ))}

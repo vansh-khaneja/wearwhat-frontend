@@ -55,7 +55,7 @@ export function Header() {
     <header className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${
       isScrolled ? "bg-white shadow-md" : "bg-transparent"
     }`}>
-      <div className="container mx-auto px-4 lg:px-8 py-3 ">
+      <div className="w-full px-8 lg:px-12 py-3">
         <nav className="flex items-center justify-between">
           <div className="flex items-center gap-4 sm:gap-8 lg:gap-12">
             {/* Logo */}
@@ -67,7 +67,7 @@ export function Header() {
                 height={820} 
                 className="object-contain h-20 w-20"
               /> */}
-              <span className="text-xl sm:text-2xl font-md tracking-wide text-gray-900">
+              <span className="text-xl sm:text-2xl font-semibold tracking-wide text-gray-900" style={{ fontFamily: 'var(--font-poppins)' }}>
                 WearWhat
               </span>
             </a>

@@ -7,15 +7,15 @@ export function CTASection() {
 			<div className="container mx-auto max-w-5xl">
 				<div className="text-center">
 					<h2 className="text-4xl md:text-5xl text-black font-normal mb-16 leading-tight">
-						MudaMuse was created to inspire you to be the best version of yourself. Our goal is to bring you clothes that blanket you in quality, design, and comfort.
+						WearWhat was built to simplify your mornings and elevate your style. Our AI-powered platform helps you make the most of what you already own.
 					</h2>
 				</div>
 				<div className="grid md:grid-cols-2 gap-16 text-gray-500">
 					<p>
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra morbi cras augue egestas dictum habitasse. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra morbi cras augue egestas dictum habitasse.
+						Stop staring at your closet wondering what to wear. Our intelligent system analyzes weather forecasts, your schedule, and personal style preferences to suggest the perfect outfit every day. Get dressed with confidence in under a minute.
 					</p>
 					<p>
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra morbi cras augue egestas dictum habitasse. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra morbi cras augue egestas dictum habitasse.
+						Discover outfit combinations you never thought of. WearWhat learns your style over time and helps you maximize your wardrobe's potential. Plan your outfits for the week, save your favorites, and track what you've worn to avoid repetition.
 					</p>
 				</div>
 				<div className="mt-16 flex flex-col sm:flex-row items-center justify-center gap-4">

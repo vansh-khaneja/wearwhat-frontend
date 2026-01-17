@@ -1,3 +1,8 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/context/AuthContext";
 import { Header } from "@/components/Header/header";
 import { HeroSection } from "@/components/home/hero-section";
 import { ScrollingLogos } from "@/components/home/scrolling-logos";
@@ -8,6 +13,29 @@ import { Footer } from "@/components/Footer/footer";
 import { HeroImageCarousel } from "@/components/home/HeroImageCarousel";
 
 export default function Page() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.push("/dashboard");
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  // Show nothing while checking auth to prevent flash
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  // If authenticated, don't render (redirect will happen)
+  if (isAuthenticated) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       <div

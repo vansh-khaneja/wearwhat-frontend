@@ -1,6 +1,6 @@
 "use client";
 
-import { X } from "lucide-react";
+import { X, Bookmark } from "lucide-react";
 import type { WardrobeItem } from "@/lib/api/types";
 import { ATTRIBUTE_LABELS } from "@/lib/api/types";
 
@@ -74,22 +74,47 @@ export default function EditImageModal({ open, onClose, item }: EditImageModalPr
           <h3 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: "#222" }}>
             Item Details
           </h3>
-          <button
-            onClick={onClose}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: 4,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: 6,
-              color: "#666",
-            }}
-          >
-            <X size={20} />
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <button
+              onClick={() => {
+                // TODO: Implement save to saved outfits
+                alert("Saved to outfits!");
+              }}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 8,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: 6,
+                color: "#666",
+                transition: "color 0.2s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#0095da")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#666")}
+              title="Save to outfits"
+            >
+              <Bookmark size={20} />
+            </button>
+            <button
+              onClick={onClose}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 4,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: 6,
+                color: "#666",
+              }}
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {/* Content */}

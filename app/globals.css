@@ -127,3 +127,26 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Scrolling animations */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 25s linear infinite;
+}
+
+.animate-scroll-images {
+  animation: scroll 30s linear infinite;
+}
+
+.animate-scroll:hover,
+.animate-scroll-images:hover {
+  animation-play-state: paused;
+}

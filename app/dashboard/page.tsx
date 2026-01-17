@@ -35,9 +35,8 @@ return (
       {/* Sidebar */}
       <aside style={{ width: 200, background: "#fff", borderRight: "1px solid #e8eaf0", display: "flex", flexDirection: "column", justifyContent: "space-between", fontFamily: 'Poppins, Arial, sans-serif' }}>
         <div>
-          <div style={{ padding: "18px 0 18px 16px", display: 'flex', alignItems: 'center', gap: 4 }}>
-            <img src="/logo.png" alt="WearWhat Logo" style={{ width: 28, height: 28, objectFit: 'contain' }} />
-            <span style={{ fontWeight: 700, fontSize: 16, color: '#171717', fontFamily: 'Poppins, Arial, sans-serif', letterSpacing: '-1px' }}>WearWhat</span>
+          <div style={{ padding: "18px 0 18px 16px", display: 'flex', alignItems: 'center' }}>
+            <span style={{ fontWeight: 700, fontSize: 18, color: '#171717', fontFamily: 'Poppins, Arial, sans-serif', letterSpacing: '-0.5px' }}>WearWhat</span>
           </div>
           <nav style={{ marginTop: 4 }}>
             {sidebarLinks.map((link) => (
