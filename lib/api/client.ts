@@ -1,0 +1,112 @@
+/**
+ * API Client - Base HTTP client for all API requests
+ * Handles request/response interceptors, error handling, and auth
+ */
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  message?: string;
+  data?: T;
+}
+
+export interface ApiError {
+  success: false;
+  message: string;
+  status: number;
+}
+
+class ApiClient {
+  private baseUrl: string;
+
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
+
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    const url = `${this.baseUrl}${endpoint}`;
+
+    const config: RequestInit = {
+      ...options,
+      credentials: 'include', // Important: includes cookies for JWT auth
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    };
+
+    // Don't set Content-Type for FormData (browser sets it with boundary)
+    if (options.body instanceof FormData) {
+      delete (config.headers as Record<string, string>)['Content-Type'];
+    }
+
+    try {
+      const response = await fetch(url, config);
+
+      // Handle non-JSON responses
+      const contentType = response.headers.get('content-type');
+      if (!contentType?.includes('application/json')) {
+        if (!response.ok) {
+          throw {
+            success: false,
+            message: 'Server error',
+            status: response.status,
+          } as ApiError;
+        }
+        return {} as T;
+      }
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw {
+          success: false,
+          message: data.detail || data.message || 'Request failed',
+          status: response.status,
+        } as ApiError;
+      }
+
+      return data as T;
+    } catch (error) {
+      if ((error as ApiError).status) {
+        throw error;
+      }
+      throw {
+        success: false,
+        message: 'Network error. Please check your connection.',
+        status: 0,
+      } as ApiError;
+    }
+  }
+
+  async get<T>(endpoint: string, options?: RequestInit): Promise<T> {
+    return this.request<T>(endpoint, { ...options, method: 'GET' });
+  }
+
+  async post<T>(endpoint: string, body?: unknown, options?: RequestInit): Promise<T> {
+    return this.request<T>(endpoint, {
+      ...options,
+      method: 'POST',
+      body: body instanceof FormData ? body : JSON.stringify(body),
+    });
+  }
+
+  async put<T>(endpoint: string, body?: unknown, options?: RequestInit): Promise<T> {
+    return this.request<T>(endpoint, {
+      ...options,
+      method: 'PUT',
+      body: JSON.stringify(body),
+    });
+  }
+
+  async delete<T>(endpoint: string, options?: RequestInit): Promise<T> {
+    return this.request<T>(endpoint, { ...options, method: 'DELETE' });
+  }
+}
+
+// Export singleton instance
+export const apiClient = new ApiClient(API_BASE_URL);

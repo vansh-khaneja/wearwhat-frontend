@@ -1,9 +1,12 @@
-
+"use client";
 
 import React, { useRef, useState } from "react";
+import { wardrobeService } from "@/lib/api/wardrobe";
 
 export default function NewOutfitModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [images, setImages] = useState<File[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   if (!open) return null;
@@ -33,6 +36,36 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
         }
         return [...prev, ...files];
       });
+    }
+  };
+
+  const handleUpload = async () => {
+    if (images.length === 0) return;
+
+    setIsUploading(true);
+    setUploadError("");
+
+    try {
+      const response = await wardrobeService.uploadImages(images);
+      if (response.success) {
+        setImages([]);
+        onClose();
+      } else {
+        setUploadError("Upload failed. Please try again.");
+      }
+    } catch (error) {
+      const message = (error as { message?: string }).message || "Upload failed. Please try again.";
+      setUploadError(message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleClose = () => {
+    if (!isUploading) {
+      setImages([]);
+      setUploadError("");
+      onClose();
     }
   };
 
@@ -78,6 +111,22 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
           minWidth: 340,
         }}>
           <h2 style={{ fontFamily: 'Poppins, Arial, sans-serif', fontSize: 26, fontWeight: 700, marginBottom: 18, letterSpacing: 0.5 }}>Add Outfits</h2>
+
+          {/* Error Message */}
+          {uploadError && (
+            <div style={{
+              width: 320,
+              padding: '10px 14px',
+              background: '#fef2f2',
+              border: '1px solid #fecaca',
+              borderRadius: 8,
+              color: '#dc2626',
+              fontSize: 14,
+            }}>
+              {uploadError}
+            </div>
+          )}
+
           <div
             style={{
               width: 320,
@@ -92,13 +141,14 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
               padding: '24px 0',
               marginBottom: 18,
               position: 'relative',
-              cursor: images.length < 9 ? 'pointer' : 'not-allowed',
+              cursor: images.length < 9 && !isUploading ? 'pointer' : 'not-allowed',
               fontFamily: 'Poppins, Arial, sans-serif',
               boxShadow: '0 2px 12px rgba(0,149,218,0.04)',
               transition: 'border 0.2s',
+              opacity: isUploading ? 0.6 : 1,
             }}
             onClick={() => {
-              if (images.length < 9 && inputRef.current) inputRef.current.click();
+              if (images.length < 9 && !isUploading && inputRef.current) inputRef.current.click();
             }}
             onDragOver={e => e.preventDefault()}
             onDrop={handleDrop}
@@ -117,7 +167,7 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
                 fontWeight: 600,
                 fontSize: 16,
                 padding: '6px 24px',
-                cursor: images.length < 9 ? 'pointer' : 'not-allowed',
+                cursor: images.length < 9 && !isUploading ? 'pointer' : 'not-allowed',
                 boxShadow: '0 1px 4px rgba(0,149,218,0.08)',
                 marginBottom: 0,
                 outline: 'none',
@@ -125,9 +175,9 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
               }}
               onClick={e => {
                 e.stopPropagation();
-                if (images.length < 9 && inputRef.current) inputRef.current.click();
+                if (images.length < 9 && !isUploading && inputRef.current) inputRef.current.click();
               }}
-              disabled={images.length >= 9}
+              disabled={images.length >= 9 || isUploading}
             >Browse Files</button>
             <input
               ref={inputRef}
@@ -136,11 +186,12 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
               multiple
               style={{ display: 'none' }}
               onChange={handleFileChange}
-              disabled={images.length >= 9}
+              disabled={images.length >= 9 || isUploading}
             />
           </div>
           <div style={{ display: 'flex', gap: 16, marginTop: 8 }}>
             <button
+              onClick={handleUpload}
               style={{
                 background: '#0095da',
                 color: '#fff',
@@ -150,17 +201,32 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
                 fontWeight: 600,
                 fontSize: 16,
                 padding: '8px 24px',
-                cursor: images.length === 0 ? 'not-allowed' : 'pointer',
+                cursor: images.length === 0 || isUploading ? 'not-allowed' : 'pointer',
                 boxShadow: '0 1px 4px rgba(0,149,218,0.08)',
                 outline: 'none',
                 marginRight: 0,
                 transition: 'background 0.2s',
-                opacity: images.length === 0 ? 0.6 : 1
+                opacity: images.length === 0 || isUploading ? 0.6 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
               }}
-              disabled={images.length === 0}
-            >Upload({images.length})</button>
+              disabled={images.length === 0 || isUploading}
+            >
+              {isUploading && (
+                <span style={{
+                  width: 16,
+                  height: 16,
+                  border: '2px solid #fff',
+                  borderTopColor: 'transparent',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                }} />
+              )}
+              {isUploading ? 'Uploading...' : `Upload(${images.length})`}
+            </button>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               style={{
                 background: '#eee',
                 color: '#444',
@@ -170,12 +236,14 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
                 fontWeight: 500,
                 fontSize: 15,
                 padding: '8px 24px',
-                cursor: 'pointer',
+                cursor: isUploading ? 'not-allowed' : 'pointer',
                 boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
                 outline: 'none',
                 marginLeft: 0,
                 transition: 'background 0.2s',
+                opacity: isUploading ? 0.6 : 1,
               }}
+              disabled={isUploading}
             >cancel</button>
           </div>
         </div>
@@ -230,36 +298,47 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
                       borderRadius: 12,
                     }}
                   />
-                  <button
-                    onClick={() => setImages(prev => prev.filter((_, i) => i !== idx))}
-                    style={{
-                      position: 'absolute',
-                      top: 6,
-                      right: 6,
-                      background: 'rgba(255,255,255,0.85)',
-                      border: 'none',
-                      borderRadius: '50%',
-                      width: 24,
-                      height: 24,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-                      zIndex: 2
-                    }}
-                    title="Remove image"
-                  >
-                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" fill="#d00"/>
-                    </svg>
-                  </button>
+                  {!isUploading && (
+                    <button
+                      onClick={() => setImages(prev => prev.filter((_, i) => i !== idx))}
+                      style={{
+                        position: 'absolute',
+                        top: 6,
+                        right: 6,
+                        background: 'rgba(255,255,255,0.85)',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: 24,
+                        height: 24,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+                        zIndex: 2
+                      }}
+                      title="Remove image"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" fill="#d00"/>
+                      </svg>
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
           )}
         </div>
       </div>
+
+      {/* CSS for spinner animation */}
+      <style jsx>{`
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      `}</style>
     </div>
   );
 }
