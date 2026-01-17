@@ -2,44 +2,37 @@
 
 import React from "react"
 import { Button } from "@/components/ui/button"
-import ThermostatIcon from '@mui/icons-material/Thermostat'
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
+import { ArrowUpRight } from "lucide-react"
 
 export function HeroSection() {
   return (
-    <div className="max-w-xl flex flex-col">
-      <h1 className="text-3xl md:text-4xl lg:text-5xl italic text-gray-900 leading-tight tracking-tight font-serif whitespace-nowrap" style={{ fontFamily: 'Georgia, Times, serif' }}>
-        Never Wonder
-      </h1>
-      <h1 className="text-3xl md:text-4xl lg:text-5xl italic text-gray-900 leading-tight tracking-tight font-serif" style={{ fontFamily: 'Georgia, Times, serif' }}>
-        What to Wear Again
-      </h1>
-      <p className="mt-3 text-base font-medium text-[#0095da]">
-        Your Personalized Style Assistant
-      </p>
-      <p className="mt-4 text-base md:text-lg text-gray-600 leading-relaxed">
-        Make the most of the wardrobe you already own. WearWhat builds confident, puttogether outfits
-        <br />
-        from your pieces in seconds, tuned to the weather, your plans, and your personal style.
-      </p>
-      {/* Feature highlights */}
-      <div className="mt-6 flex flex-wrap gap-4">
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <ThermostatIcon className="w-4 h-4 text-[#0095da]" />
-          <span>Weatherready outfits</span>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <AutoAwesomeIcon className="w-4 h-4 text-[#0095da]" />
-          <span>AIpowered suggestions</span>
-        </div>
+    <div className="flex flex-col relative z-20 min-w-[200%]">
+      <div className="flex flex-col font-sans font-black tracking-[-0.02em] leading-[0.85] text-[5rem] md:text-[7rem] lg:text-[10rem] select-none">
+        <h1 className="text-black uppercase">
+          Get
+        </h1>
+        <h1 className="text-black uppercase">
+          Yourself
+        </h1>
+        <h1 className="uppercase break-words w-full" style={{ color: 'rgba(255,255,255,0.85)', WebkitTextStroke: '2px rgba(255,255,255,0.4)', textShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+          Into The
+        </h1>
+        <h1 className="uppercase break-words w-full" style={{ color: 'rgba(255,255,255,0.85)', WebkitTextStroke: '2px rgba(255,255,255,0.4)', textShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+          Right Gear
+        </h1>
       </div>
-      <div className="mt-6 flex flex-col sm:flex-row gap-4">
-        <Button className="mt-6 bg-[#0095da] hover:bg-[#007ab8] text-white px-8 py-3.5 text-base rounded-full font-semibold shadow-md hover:shadow-lg focus:ring-[#0095da] active:scale-[0.98] border-2 border-[#0095da]">
-          Start styling for free
-        </Button>
-        <Button className="mt-6 bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700 hover:text-gray-900 px-8 py-3.5 text-base rounded-full font-semibold shadow-sm hover:shadow-md focus:ring-gray-300 active:scale-[0.98]">
-          See how it works
-        </Button>
+      
+      <div className="mt-12 flex items-center gap-2 absolute bottom-0 left-0">
+        <button className="text-xs md:text-sm font-bold tracking-[0.1em] uppercase flex items-center gap-1 hover:gap-2 transition-all text-black hover:text-gray-800">
+          Start Styling for Free
+          <ArrowUpRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="mt-8 flex flex-col sm:flex-row gap-4 opacity-0 h-0 overflow-hidden">
+        {/* Hidden original buttons to preserve structure if needed later, or removed. 
+            I'll hide them for now to match the design requested. 
+        */}
       </div>
     </div>
   )

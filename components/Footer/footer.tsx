@@ -1,155 +1,72 @@
-import { Shirt } from "lucide-react"
+import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import Image from "next/image";
 
 export function Footer() {
-	return (
-		<footer className="bg-gray-900 text-white">
-			<div className="container mx-auto px-4 lg:px-8 py-12">
-				{/* Top Section: Logo and Navigation */}
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12 mb-8">
-					{/* Logo Section */}
-					<div className="lg:col-span-2">
-						<div className="flex items-center gap-3 mb-4">
-							<div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
-								<Shirt className="w-6 h-6 text-white" />
-							</div>
-							<span className="text-2xl font-bold">
-								WearWhat<sup className="text-sm">4</sup>
-							</span>
-						</div>
-					</div>
-
-					{/* Navigation Columns */}
-					<div>
-						<h3 className="font-bold text-white mb-4">Features</h3>
-						<ul className="space-y-3 text-gray-400">
-							<li>
-								<a href="#" className="hover:text-white transition-colors">
-									Style Assistant
-								</a>
-							</li>
-							<li>
-								<a href="#" className="hover:text-white transition-colors">
-									Wardrobe Manager
-								</a>
-							</li>
-							<li>
-								<a href="#" className="hover:text-white transition-colors">
-									Weather Integration
-								</a>
-							</li>
-							<li>
-								<a href="#" className="hover:text-white transition-colors">
-									Outfit Planner
-								</a>
-							</li>
-							<li>
-								<a href="#" className="hover:text-white transition-colors">
-									Mobile App
-								</a>
-							</li>
-						</ul>
-					</div>
-
-					<div>
-						<h3 className="font-bold text-white mb-4">Resources</h3>
-						<ul className="space-y-3 text-gray-400">
-							<li>
-								<a href="#" className="hover:text-white transition-colors">
-									Help Center
-								</a>
-							</li>
-							<li>
-								<a href="#" className="hover:text-white transition-colors">
-									Blog
-								</a>
-							</li>
-							<li>
-								<a href="#" className="hover:text-white transition-colors">
-									Style Guide
-								</a>
-							</li>
-							<li>
-								<a href="#" className="hover:text-white transition-colors">
-									API Docs
-								</a>
-							</li>
-						</ul>
-					</div>
-
-					<div>
-						<h3 className="font-bold text-white mb-4">Company</h3>
-						<ul className="space-y-3 text-gray-400">
-							<li>
-								<a href="#" className="hover:text-white transition-colors">
-									Privacy
-								</a>
-							</li>
-							<li>
-								<a href="#" className="hover:text-white transition-colors">
-									Terms
-								</a>
-							</li>
-							<li>
-								<a href="#" className="hover:text-white transition-colors">
-									Contact
-								</a>
-							</li>
-							<li>
-								<a href="#" className="hover:text-white transition-colors">
-									FAQ&apos;s
-								</a>
-							</li>
-						</ul>
-					</div>
-
-					<div>
-						<h3 className="font-bold text-white mb-4">Connect</h3>
-						<ul className="space-y-3 text-gray-400">
-							<li>
-								<a href="#" className="hover:text-white transition-colors">
-									Twitter
-								</a>
-							</li>
-							<li>
-								<a href="#" className="hover:text-white transition-colors">
-									Instagram
-								</a>
-							</li>
-							<li>
-								<a href="#" className="hover:text-white transition-colors">
-									LinkedIn
-								</a>
-							</li>
-						</ul>
-					</div>
-				</div>
-
-				{/* Separator */}
-				<div className="border-t border-gray-800 my-8"></div>
-
-				{/* Bottom Section: Copyright and Made in India */}
-				<div className="flex flex-col md:flex-row justify-between items-center gap-4">
-					<p className="text-gray-400 text-sm">
-						WearWhat Technology Pvt Ltd. All rights reserved, 2025.
-					</p>
-					<div className="flex items-center gap-2 text-gray-400 text-sm">
-						<span>Made in</span>
-						<div className="flex items-center">
-							{/* Indian Flag - Tricolor with Ashoka Chakra */}
-							<div className="flex flex-col h-4 w-6 rounded-sm overflow-hidden border border-gray-600">
-								<div className="h-1/3 bg-[#FF9933]"></div>
-								<div className="h-1/3 bg-white flex items-center justify-center relative">
-									<div className="w-1.5 h-1.5 border border-[#000080] rounded-full flex items-center justify-center">
-										<div className="w-0.5 h-0.5 bg-[#000080] rounded-full"></div>
-									</div>
-								</div>
-								<div className="h-1/3 bg-[#138808]"></div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</footer>
-	)
+  return (
+    <footer className="bg-[#1C1C1C] text-white">
+      <div className="max-w-screen-xl mx-auto">
+        <div className="grid lg:grid-cols-2">
+          <div className="px-12 py-16 flex flex-col justify-between bg-cover bg-center" style={{ backgroundImage: "url('/clothes-hanging.jpeg')" }}>
+            <div>
+              <div className="w-16 h-16 mb-8">
+                <Image 
+                  src="/logo1.png" 
+                  alt="WearWhat Logo" 
+                  width={64} 
+                  height={64} 
+                  className="object-contain"
+                />
+              </div>
+              <h2 className="text-5xl font-light leading-tight max-w-sm">
+                Find out about the sales at your local shop
+              </h2>
+            </div>
+            <button className="mt-8 border border-white px-8 py-3 text-sm font-semibold tracking-widest hover:bg-white hover:text-black transition-colors w-fit">
+              FIND SHOPS
+            </button>
+          </div>
+          <div className="px-12 py-16">
+            <div className="grid grid-cols-3 gap-8">
+              <div>
+                <h3 className="font-bold tracking-widest mb-6">CATEGORIES</h3>
+                <ul className="space-y-3 text-gray-400 font-light">
+                  <li><a href="#" className="hover:text-white transition-colors">Hoodies</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Sweatshirts</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Shirts</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">T-Shirts</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Jackets</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-bold tracking-widest mb-6">COMPANY</h3>
+                <ul className="space-y-3 text-gray-400 font-light">
+                  <li><a href="#" className="hover:text-white transition-colors">About</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Guarantee</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Shipping</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-bold tracking-widest mb-6">SUPPORT</h3>
+                <ul className="space-y-3 text-gray-400 font-light">
+                  <li><a href="#" className="hover:text-white transition-colors">Style Guide</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Licensing</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Change log</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Instructions</a></li>
+                </ul>
+              </div>
+            </div>
+            <div className="mt-16 flex justify-end space-x-6">
+              <a href="#" className="text-gray-400 hover:text-white"><Facebook size={20} /></a>
+              <a href="#" className="text-gray-400 hover:text-white"><Twitter size={20} /></a>
+              <a href="#" className="text-gray-400 hover:text-white"><Youtube size={20} /></a>
+              <a href="#" className="text-gray-400 hover:text-white"><Instagram size={20} /></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
 }
 

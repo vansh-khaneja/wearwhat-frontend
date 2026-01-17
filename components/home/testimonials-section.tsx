@@ -80,7 +80,7 @@ export function TestimonialsSection() {
 	}
 
 	return (
-		<section className="py-20 px-4 lg:px-8 bg-white relative overflow-hidden">
+		<section className="py-20 px-4 lg:px-8 bg-gray-100 relative overflow-hidden">
 			{/* Decorative star graphic */}
 			<div 
 				className="absolute left-0 top-1/2 -translate-y-1/2 opacity-10"
@@ -109,10 +109,10 @@ export function TestimonialsSection() {
 
 				{/* Heading */}
 				<div className="text-center mb-4">
-					<h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3">
+					<h2 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-wide text-gray-900 mb-3">
 						Hear from people who love it
 					</h2>
-					<p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
+					<p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto font-light tracking-wide">
 						From students to professionals, everyone's finding their style with WearWhat
 					</p>
 				</div>
@@ -142,21 +142,21 @@ export function TestimonialsSection() {
 									>
 										{/* Company/Name */}
 										<div className="mb-6">
-											<h3 className="text-xl font-bold text-gray-800">
+											<h3 className="text-xl font-light tracking-wide text-gray-800">
 												{testimonial.company}
 											</h3>
 										</div>
 
 										{/* Quote */}
 										<div className="mb-4">
-											<p className="text-2xl font-bold text-gray-900 leading-tight">
+											<p className="text-2xl font-light tracking-wide text-gray-900 leading-tight">
 												&ldquo;{testimonial.quote}&rdquo;
 											</p>
 										</div>
 
 										{/* Testimonial Body */}
 										<div className="mb-6">
-											<p className="text-base text-gray-600 leading-relaxed">
+											<p className="text-base text-gray-600 leading-relaxed font-light tracking-wide">
 												{testimonial.testimonial}
 											</p>
 										</div>
@@ -173,8 +173,8 @@ export function TestimonialsSection() {
 												/>
 											</div>
 											<div>
-												<p className="font-semibold text-gray-900">{testimonial.name}</p>
-												<p className="text-sm text-gray-600">{testimonial.role}</p>
+												<p className="font-light tracking-wide text-gray-900">{testimonial.name}</p>
+												<p className="text-sm text-gray-600 font-light tracking-wide">{testimonial.role}</p>
 											</div>
 										</div>
 									</div>

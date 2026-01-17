@@ -61,10 +61,10 @@ export function Header() {
             {/* Logo */}
             <a href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200">
               <Image 
-                src="/logo.png" 
+                src="/logo1.png" 
                 alt="WearWhat Logo" 
-                width={32} 
-                height={32} 
+                width={40} 
+                height={40} 
                 className="object-contain"
               />
               <span className="text-xl sm:text-2xl font-bold text-gray-900">
