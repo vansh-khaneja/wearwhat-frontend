@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WearWhat — Frontend
 
-## Getting Started
+A Next.js + TypeScript frontend for the WearWhat application: an outfit planning and styling web app. This repository contains the UI, pages, and components used by the WearWhat product.
 
-First, run the development server:
+## Key Features
+
+- Pages: Home, Dashboard (Community, Planning, Saved, StyleChat, Styling, Wardrobe), Login, Signup
+- Component library under `components/` for reusable UI (Header, Footer, dashboard widgets, modals)
+- API clients and context utilities in `lib/` for auth, wardrobe, styling, saved images, and calendar outfits
+
+## Tech Stack
+
+- Next.js
+- React + TypeScript
+- Tailwind CSS
+- MUI (Material UI) + Emotion
+- Framer Motion
+
+## Prerequisites
+
+- Node.js 18+ recommended
+- npm, pnpm or yarn
+
+## Quick Start
+
+Clone the repo, install dependencies and run the dev server:
 
 ```bash
+git clone <your-repo-url>
+cd WearWhat-frontend
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Available npm scripts (see `package.json`):
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `dev` — run development server
+- `build` — build for production
+- `start` — start production server
+- `lint` — run ESLint
 
-## Learn More
+## Environment
 
-To learn more about Next.js, take a look at the following resources:
+Create a `.env.local` in the project root for any runtime configuration the app needs. Common variables you may need to set (add as required by your backend):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `NEXT_PUBLIC_API_URL` — base URL for the API
+- `NEXT_PUBLIC_SOME_KEY` — example public key
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Do not commit secrets to the repository.
 
-## Deploy on Vercel
+## Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `app/` — Next.js app routes and pages
+- `components/` — reusable React components
+- `lib/` — API clients, utilities, and context providers
+- `public/` — static assets
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploy
+
+This app is optimized for deployment on Vercel, but can be deployed to any platform that supports Node.js:
+
+```bash
+npm run build
+npm run start
+```
+
+## Contributing
+
+- Open issues for bugs and feature requests.
+- Send PRs for improvements; include a short description of the change and motivation.
+
+## Next steps / suggestions
+
+- Add example `.env.local.example` with required env vars.
+- Add a `CONTRIBUTING.md` and `LICENSE` if you plan to accept contributions.
+
+---
+
+If you want, I can also:
+
+- add a `.env.local.example` file,
+- run the dev server to confirm everything starts, or
+- create a short `CONTRIBUTING.md` template.
+
+Updated README for developer onboarding.
