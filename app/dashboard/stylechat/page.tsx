@@ -80,7 +80,7 @@ export default function StyleChatPage() {
             >
               {msg.from === 'bot' && (
                 <Avatar className="w-8 h-8">
-                  <AvatarFallback>🤖</AvatarFallback>
+                  <AvatarFallback>AI</AvatarFallback>
                 </Avatar>
               )}
               <div
