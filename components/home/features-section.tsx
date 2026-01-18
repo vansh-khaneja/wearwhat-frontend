@@ -23,7 +23,7 @@ export function FeaturesSection() {
 					{/* Left - Text Content */}
 					<div>
 						<h2 className="text-5xl md:text-6xl lg:text-7xl font-md text-black leading-tight mb-8" >
-							your closet,<br />reimagined
+							Your closet,<br />reimagined
 						</h2>
 						<p className="text-lg md:text-xl text-gray-500 leading-relaxed" style={{ fontFamily: 'var(--font-poppins)' }}>
 							organize your clothes effortlessly and dress smarter every day: get AI-powered outfit suggestions, weather-based recommendations, and discover new ways to style what you already own.
