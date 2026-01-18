@@ -86,7 +86,7 @@ export function Header() {
               Sign in
             </a>
             <a href="/signup">
-              <Button variant="ghost" className="text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#0095da] focus:ring-offset-2 rounded px-2 py-1">
+              <Button className="text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#0095da] focus:ring-offset-2 rounded px-2 py-1">
                 Start free
               </Button>
             </a>

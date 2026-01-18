@@ -65,6 +65,8 @@ export interface WardrobeItem {
   category: string;
   attributes: WardrobeItemAttributes;
   created_at?: string;
+  saved?: boolean;
+  saved_image_id?: string;
 }
 
 export interface WardrobeUploadResponse {
@@ -93,6 +95,7 @@ export interface SavedImage {
   id: string;
   user_id: string;
   image_id: string;
+  image_url: string;
   note: string | null;
   saved_at: string;
 }

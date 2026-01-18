@@ -118,7 +118,7 @@ export default function WardrobePage() {
         <Alert variant="destructive" className="my-5">
           <AlertDescription className="flex items-center justify-between">
             {error}
-            <Button onClick={fetchItems} variant="destructive">
+            <Button onClick={fetchItems}>
               Retry
             </Button>
           </AlertDescription>

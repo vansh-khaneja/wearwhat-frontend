@@ -36,7 +36,6 @@ export default function PlanningPage() {
           onClick={() => setCarouselIdx((idx) => Math.max(idx - 1, 1))}
           disabled={carouselIdx <= 1}
           aria-label="Previous day"
-          variant="outline"
           className="absolute left-0 top-1/2 -translate-y-1/2 transform rounded-full"
         >
           <svg
@@ -111,7 +110,6 @@ export default function PlanningPage() {
           }
           disabled={carouselIdx >= week.length - 2}
           aria-label="Next day"
-          variant="outline"
           className="absolute right-0 top-1/2 -translate-y-1/2 transform rounded-full"
         >
           <svg
