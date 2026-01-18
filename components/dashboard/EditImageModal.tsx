@@ -1,11 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import { X, Bookmark, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Bookmark, Trash2, Loader2, Check } from "lucide-react";
 import type { WardrobeItem } from "@/lib/api/types";
 import { ATTRIBUTE_LABELS } from "@/lib/api/types";
 import { wardrobeService } from "@/lib/api/wardrobe";
 import { savedImagesService } from "@/lib/api/savedImages";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface EditImageModalProps {
   open: boolean;
@@ -15,23 +26,29 @@ interface EditImageModalProps {
 }
 
 export default function EditImageModal({ open, onClose, item, onDelete }: EditImageModalProps) {
-
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [currentItem, setCurrentItem] = useState(item);
 
-  if (!open || !item) return null;
+  useEffect(() => {
+    setCurrentItem(item);
+    setSaveError("");
+    setSaveSuccess(false);
+  }, [item]);
+
+  if (!open || !currentItem) return null;
 
   const handleDelete = async () => {
-    if (!item) return;
+    if (!currentItem) return;
 
     setIsDeleting(true);
     try {
-      const response = await wardrobeService.deleteItem(item.id);
+      const response = await wardrobeService.deleteItem(currentItem.id);
       if (response.success) {
-        onDelete?.(item.id);
+        onDelete?.(currentItem.id);
         onClose();
       }
     } catch (error) {
@@ -40,6 +57,31 @@ export default function EditImageModal({ open, onClose, item, onDelete }: EditIm
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
+    }
+  };
+
+  const handleSaveToggle = async () => {
+    if (!currentItem) return;
+
+    setIsSaving(true);
+    setSaveError("");
+    setSaveSuccess(false);
+
+    try {
+      if (currentItem.saved) {
+        if (!currentItem.saved_image_id) throw new Error("Saved image ID is missing");
+        await savedImagesService.delete(currentItem.saved_image_id);
+        setCurrentItem(prev => prev ? { ...prev, saved: false, saved_image_id: undefined } : null);
+      } else {
+        const response = await savedImagesService.saveImage({ image_id: currentItem.id });
+        setCurrentItem(prev => prev ? { ...prev, saved: true, saved_image_id: response.id } : null);
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 2000);
+      }
+    } catch (err) {
+      setSaveError(`Failed to ${currentItem.saved ? 'unsave' : 'save'} item.`);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -64,393 +106,139 @@ export default function EditImageModal({ open, onClose, item, onDelete }: EditIm
   };
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 1000,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "rgba(0,0,0,0.5)",
-        backdropFilter: "blur(4px)",
-      }}
-      onClick={onClose}
-    >
+    <>
       <div
-        style={{
-          background: "#fff",
-          borderRadius: 16,
-          width: "100%",
-          maxWidth: 700,
-          maxHeight: "90vh",
-          overflow: "hidden",
-          display: "flex",
-          flexDirection: "column",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
-        }}
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
       >
-        {/* Header */}
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "16px 20px",
-            borderBottom: "1px solid #eee",
-          }}
+          className="relative m-4 w-full max-w-3xl rounded-2xl bg-white dark:bg-gray-900 shadow-2xl flex flex-col max-h-[90vh]"
+          onClick={(e) => e.stopPropagation()}
         >
-          <h3 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: "#222" }}>
-            Item Details
-          </h3>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            {item.saved ? (
-              <button
-                onClick={async () => {
-                  if (!item || !item.saved_image_id) return;
-                  setIsSaving(true);
-                  setSaveError("");
-                  setSaveSuccess(false);
-                  try {
-                    await savedImagesService.delete(item.saved_image_id);
-                    item.saved = false;
-                    item.saved_image_id = undefined;
-                    setSaveSuccess(false);
-                  } catch (err) {
-                    setSaveError("Failed to remove saved image");
-                  } finally {
-                    setIsSaving(false);
-                  }
-                }}
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: isSaving ? "not-allowed" : "pointer",
-                  padding: 8,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: 6,
-                  color: "#22c55e",
-                  transition: "color 0.2s",
-                  opacity: isSaving ? 0.6 : 1,
-                }}
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+              Item Details
+            </h3>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleSaveToggle}
                 disabled={isSaving}
-                title="Remove from saved"
+                className={`text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 ${
+                  currentItem.saved ? "text-blue-500 dark:text-blue-400" : ""
+                }`}
               >
-                <Bookmark size={20} fill="#22c55e" />
-                {isSaving && (
-                  <span style={{ marginLeft: 8, fontSize: 12 }}>Removing...</span>
+                {isSaving ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : saveSuccess ? (
+                  <Check className="h-5 w-5 text-green-500" />
+                ) : (
+                  <Bookmark className={`h-5 w-5 ${currentItem.saved ? 'fill-current' : ''}`} />
                 )}
-              </button>
-            ) : (
-              <button
-                onClick={async () => {
-                  if (!item) return;
-                  setIsSaving(true);
-                  setSaveError("");
-                  setSaveSuccess(false);
-                  try {
-                    await savedImagesService.saveImage({ image_id: item.id });
-                    item.saved = true;
-                    setSaveSuccess(true);
-                    setTimeout(() => setSaveSuccess(false), 1500);
-                  } catch (err) {
-                    setSaveError("Failed to save image");
-                  } finally {
-                    setIsSaving(false);
-                  }
-                }}
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: isSaving ? "not-allowed" : "pointer",
-                  padding: 8,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: 6,
-                  color: saveSuccess ? "#22c55e" : "#666",
-                  transition: "color 0.2s",
-                  opacity: isSaving ? 0.6 : 1,
-                }}
-                disabled={isSaving}
-                onMouseEnter={(e) => (e.currentTarget.style.color = saveSuccess ? "#22c55e" : "#0095da")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = saveSuccess ? "#22c55e" : "#666")}
-                title={saveSuccess ? "Saved!" : "Save to outfits"}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowDeleteConfirm(true)}
+                className="text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-500"
               >
-                <Bookmark size={20} />
-                {isSaving && (
-                  <span style={{ marginLeft: 8, fontSize: 12 }}>Saving...</span>
-                )}
-                {saveSuccess && (
-                  <span style={{ marginLeft: 8, fontSize: 12, color: "#22c55e" }}>Saved!</span>
-                )}
-              </button>
-            )}
-            {saveError && (
-              <span style={{ color: "#dc2626", fontSize: 12, marginLeft: 8 }}>{saveError}</span>
-            )}
-            <button
-              onClick={() => setShowDeleteConfirm(true)}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: 8,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: 6,
-                color: "#666",
-                transition: "color 0.2s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#dc2626")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#666")}
-              title="Delete item"
-            >
-              <Trash2 size={20} />
-            </button>
-            <button
-              onClick={onClose}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: 4,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: 6,
-                color: "#666",
-              }}
-            >
-              <X size={20} />
-            </button>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div
-          style={{
-            display: "flex",
-            gap: 24,
-            padding: 24,
-            overflow: "auto",
-          }}
-        >
-          {/* Image */}
-          <div
-            style={{
-              flex: "0 0 280px",
-              background: "#f7f7f7",
-              borderRadius: 12,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: 16,
-              aspectRatio: "3/4",
-            }}
-          >
-            <img
-              src={item.image_url}
-              alt={item.category}
-              style={{
-                maxWidth: "100%",
-                maxHeight: "100%",
-                objectFit: "contain",
-                borderRadius: 8,
-              }}
-            />
+                <Trash2 className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onClose}
+                className="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
 
-          {/* Tags/Attributes */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            {/* Category */}
-            <div style={{ marginBottom: 20 }}>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#888",
-                  fontWeight: 500,
-                  marginBottom: 6,
-                  textTransform: "uppercase",
-                  letterSpacing: 0.5,
-                }}
-              >
-                Category
-              </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <span
-                  style={{
-                    background: "#0095da",
-                    color: "#fff",
-                    padding: "6px 12px",
-                    borderRadius: 20,
-                    fontSize: 13,
-                    fontWeight: 500,
-                  }}
-                >
-                  {item.category}
-                </span>
-                <span
-                  style={{
-                    background: "#e8f4fc",
-                    color: "#0095da",
-                    padding: "6px 12px",
-                    borderRadius: 20,
-                    fontSize: 13,
-                    fontWeight: 500,
-                  }}
-                >
-                  {getCategoryGroupLabel(item.categoryGroup)}
-                </span>
+          {/* Content */}
+          <div className="flex flex-col md:flex-row gap-6 p-6 overflow-y-auto">
+            {/* Image */}
+            <div className="w-full md:w-1/2 flex-shrink-0">
+              <div className="aspect-square w-full rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
+                <img
+                  src={currentItem.image_url}
+                  alt={currentItem.category}
+                  className="h-full w-full object-contain"
+                />
               </div>
             </div>
 
-            {/* Attributes */}
-            <div style={{ marginBottom: 20 }}>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#888",
-                  fontWeight: 500,
-                  marginBottom: 10,
-                  textTransform: "uppercase",
-                  letterSpacing: 0.5,
-                }}
-              >
-                Attributes
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {Object.entries(item.attributes).map(([key, value]) => (
-                  <div
-                    key={key}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontSize: 13,
-                        color: "#666",
-                        minWidth: 100,
-                      }}
-                    >
-                      {ATTRIBUTE_LABELS[key] || key}:
-                    </span>
-                    <span
-                      style={{
-                        background: "#f0f0f0",
-                        color: "#333",
-                        padding: "4px 10px",
-                        borderRadius: 6,
-                        fontSize: 13,
-                        fontWeight: 500,
-                      }}
-                    >
-                      {value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Date Added */}
-            {item.created_at && (
+            {/* Details */}
+            <div className="w-full md:w-1/2 space-y-6">
               <div>
-                <div
-                  style={{
-                    fontSize: 12,
-                    color: "#888",
-                    fontWeight: 500,
-                    marginBottom: 6,
-                    textTransform: "uppercase",
-                    letterSpacing: 0.5,
-                  }}
-                >
-                  Added
-                </div>
-                <span style={{ fontSize: 13, color: "#444" }}>
-                  {formatDate(item.created_at)}
-                </span>
+                <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Category</h4>
+                <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 capitalize">
+                  {currentItem.category.replace(/_/g, " ")}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {getCategoryGroupLabel(currentItem.categoryGroup)}
+                </p>
               </div>
-            )}
+
+              <div>
+                <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Attributes</h4>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                  {Object.entries(currentItem.attributes)
+                    .filter(([, value]) => value)
+                    .map(([key, value]) => (
+                      <div key={key}>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {(ATTRIBUTE_LABELS as any)[key] || key}
+                        </p>
+                        <p className="text-sm font-medium text-gray-800 dark:text-gray-200 capitalize">
+                          {value}
+                        </p>
+                      </div>
+                    ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Added On</h4>
+                <p className="text-sm text-gray-800 dark:text-gray-200">
+                  {formatDate(currentItem.created_at)}
+                </p>
+              </div>
+
+              {saveError && (
+                <p className="text-sm text-red-500">{saveError}</p>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 1100,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "rgba(0,0,0,0.6)",
-          }}
-          onClick={() => setShowDeleteConfirm(false)}
-        >
-          <div
-            style={{
-              background: "#fff",
-              borderRadius: 12,
-              padding: 24,
-              width: "100%",
-              maxWidth: 400,
-              boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h4 style={{ margin: "0 0 12px", fontSize: 18, fontWeight: 600, color: "#222" }}>
-              Delete Item
-            </h4>
-            <p style={{ margin: "0 0 24px", fontSize: 14, color: "#666" }}>
-              Are you sure you want to delete this item? This action cannot be undone.
-            </p>
-            <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                style={{
-                  padding: "10px 20px",
-                  borderRadius: 8,
-                  border: "1px solid #ddd",
-                  background: "#fff",
-                  fontSize: 14,
-                  fontWeight: 500,
-                  cursor: "pointer",
-                  color: "#333",
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={isDeleting}
-                style={{
-                  padding: "10px 20px",
-                  borderRadius: 8,
-                  border: "none",
-                  background: "#dc2626",
-                  fontSize: 14,
-                  fontWeight: 500,
-                  cursor: isDeleting ? "not-allowed" : "pointer",
-                  color: "#fff",
-                  opacity: isDeleting ? 0.7 : 1,
-                }}
-              >
-                {isDeleting ? "Deleting..." : "Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this
+              item from your wardrobe.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting
+                </>
+              ) : (
+                "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

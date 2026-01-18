@@ -1,11 +1,12 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
-import { FiCalendar } from "react-icons/fi";
-import { X, Sparkles, Send, Loader2, Trash2 } from "lucide-react";
+import { FiCalendar, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { X, Send, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { stylingService, type StylingRecommendationResponse } from "@/lib/api/styling";
 import { calendarOutfitsService, type CalendarOutfit } from "@/lib/api/calendarOutfits";
+import { cn } from "@/lib/utils";
 
 interface DayData {
   day: string;
@@ -44,7 +45,7 @@ function generateWeekData(): DayData[] {
       day: dayName,
       date: dateStr,
       fullDate,
-      temp: `${temps[i + 2]}° ${lows[i + 2]}°`,
+      temp: `${temps[i + 2]}° / ${lows[i + 2]}°`,
       tempValue: temps[i + 2],
       icon: icons[i + 2],
       today: isToday,
@@ -98,6 +99,8 @@ export default function PlanningPage() {
   useEffect(() => {
     fetchSavedOutfits();
   }, [fetchSavedOutfits]);
+  
+  // ... (keep the rest of the component logic the same)
 
   const handleCardClick = (day: DayData) => {
     setSelectedDay(day);
@@ -215,64 +218,50 @@ export default function PlanningPage() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+      <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
         Outfit Calendar
       </h1>
+      <p className="mt-2 text-gray-500 dark:text-gray-400">
+        Plan your outfits for the week with AI-powered suggestions based on weather.
+      </p>
       <div className="relative mt-8 flex flex-1 items-center justify-center">
         {/* Left arrow */}
         <Button
           onClick={() => setCarouselIdx((idx) => Math.max(idx - 1, 1))}
           disabled={carouselIdx <= 1}
           aria-label="Previous day"
+          variant="outline"
+          size="icon"
           className="absolute left-0 top-1/2 -translate-y-1/2 transform rounded-full"
         >
-          <svg
-            width="22"
-            height="22"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            viewBox="0 0 24 24"
-          >
-            <path d="M15 19l-7-7 7-7" />
-          </svg>
+          <FiChevronLeft className="h-6 w-6" />
         </Button>
         <div className="flex w-full items-center justify-center gap-x-8">
           {visible.map((d, i) => {
             const isCenter = i === 1;
             const savedOutfit = savedOutfits[d.fullDate];
-            const cardClasses = `
-              flex flex-col items-center justify-center transition-all duration-300 ease-in-out
-              ${isCenter ? "z-10 scale-100" : "z-0 scale-90 opacity-80"}
-            `;
             return (
-              <div key={d.day + d.date} className={cardClasses}>
-                <div className="mb-2 flex flex-col items-center">
+              <div key={d.day + d.date} className={cn("flex flex-col items-center justify-center transition-all duration-300 ease-in-out", isCenter ? "z-10 scale-100" : "z-0 scale-90 opacity-70")}>
+                <div className="mb-3 flex flex-col items-center">
                   <div
-                    className={`relative text-center font-semibold ${
-                      isCenter ? "text-lg" : "text-base"
-                    } ${d.today ? "text-gray-900" : "text-gray-600"}`}
+                    className={cn("relative text-center font-semibold", isCenter ? "text-lg" : "text-base", d.today ? "text-gray-900 dark:text-gray-100" : "text-gray-600 dark:text-gray-400")}
                   >
                     {d.today && (
-                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-gray-900">
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-gray-900 dark:text-gray-100">
                         •
                       </span>
                     )}
                     {d.day}
                   </div>
                   <div
-                    className={`mt-1 text-xs ${
-                      isCenter ? "text-gray-500" : "text-gray-400"
-                    }`}
+                    className={cn("mt-1 text-xs", isCenter ? "text-gray-500 dark:text-gray-400" : "text-gray-400 dark:text-gray-500")}
                   >
                     {d.date}
                   </div>
-                  <div className="mt-1 flex items-center gap-1">
+                  <div className="mt-2 flex items-center gap-1">
                     {getWeatherIcon(d.icon)}
                     <span
-                      className={`text-xs ${
-                        isCenter ? "text-gray-500" : "text-gray-400"
-                      }`}
+                      className={cn("text-xs", isCenter ? "text-gray-500 dark:text-gray-400" : "text-gray-400 dark:text-gray-500")}
                     >
                       {d.temp}
                     </span>
@@ -280,12 +269,10 @@ export default function PlanningPage() {
                 </div>
                 <div
                   onClick={() => handleCardClick(d)}
-                  className={`flex h-96 w-72 cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white transition-all duration-300 ease-in-out hover:border-gray-400 ${
-                    isCenter ? "shadow-xl" : "shadow-sm"
-                  }`}
+                  className={cn("flex h-96 w-72 cursor-pointer items-center justify-center overflow-hidden rounded-xl border bg-white dark:bg-gray-800 transition-all duration-300 ease-in-out hover:border-gray-400 dark:hover:border-gray-500", isCenter ? "shadow-xl dark:shadow-2xl" : "shadow-sm dark:shadow-md", savedOutfit ? "border-gray-300 dark:border-gray-600" : "border-dashed border-gray-200 dark:border-gray-700")}
                 >
                   {loadingSavedOutfits ? (
-                    <Loader2 className="h-8 w-8 animate-spin text-gray-300" />
+                    <Loader2 className="h-8 w-8 animate-spin text-gray-300 dark:text-gray-600" />
                   ) : savedOutfit ? (
                     <img
                       src={savedOutfit.combined_image_url}
@@ -294,8 +281,8 @@ export default function PlanningPage() {
                     />
                   ) : (
                     <FiCalendar
-                      size={isCenter ? 64 : 56}
-                      className="text-gray-400"
+                      size={isCenter ? 56 : 48}
+                      className="text-gray-300 dark:text-gray-600"
                     />
                   )}
                 </div>
@@ -310,50 +297,45 @@ export default function PlanningPage() {
           }
           disabled={carouselIdx >= week.length - 2}
           aria-label="Next day"
+          variant="outline"
+          size="icon"
           className="absolute right-0 top-1/2 -translate-y-1/2 transform rounded-full"
         >
-          <svg
-            width="22"
-            height="22"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            viewBox="0 0 24 24"
-          >
-            <path d="M9 5l7 7-7 7" />
-          </svg>
+          <FiChevronRight className="h-6 w-6" />
         </Button>
       </div>
 
       {/* Modal */}
       {selectedDay && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
           onClick={handleCloseModal}
         >
           <div
-            className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-2xl bg-white shadow-2xl"
+            className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+            <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 px-6 py-4">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   {getWeatherIcon(selectedDay.icon, 28)}
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                       {selectedDay.today ? "Today" : selectedDay.day}, {selectedDay.date}
                     </h2>
-                    <p className="text-sm text-gray-500">{selectedDay.temp}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{selectedDay.temp}</p>
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 {hasSavedOutfit && (
-                  <button
+                  <Button
                     onClick={handleDeleteOutfit}
                     disabled={isDeleting}
-                    className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-500 disabled:opacity-50"
+                    variant="ghost"
+                    size="icon"
+                    className="text-gray-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/50 dark:hover:text-red-400 disabled:opacity-50"
                     title="Delete outfit"
                   >
                     {isDeleting ? (
@@ -361,14 +343,16 @@ export default function PlanningPage() {
                     ) : (
                       <Trash2 size={20} />
                     )}
-                  </button>
+                  </Button>
                 )}
-                <button
+                <Button
                   onClick={handleCloseModal}
-                  className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                  variant="ghost"
+                  size="icon"
+                  className="text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
                 >
                   <X size={20} />
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -376,25 +360,24 @@ export default function PlanningPage() {
             <div className="overflow-y-auto p-6" style={{ maxHeight: "calc(90vh - 80px)" }}>
               {/* Prompt Input */}
               <form onSubmit={handleGenerateOutfit} className="mb-6">
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                   What&apos;s your plan for this day?
                 </label>
                 <div className="flex items-center gap-3">
                   <div className="relative flex-1">
-                    <Sparkles className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
                     <Input
                       type="text"
                       placeholder="e.g., office meeting, casual brunch, date night..."
                       value={prompt}
                       onChange={(e) => setPrompt(e.target.value)}
                       disabled={isLoading}
-                      className="h-12 pl-12 pr-4 text-base rounded-xl border-gray-300 bg-gray-50 shadow-sm focus:border-gray-900 focus:ring-gray-900"
+                      className="h-12 px-4 text-base rounded-xl border-gray-300 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 shadow-sm focus:border-gray-900 focus:ring-gray-900"
                     />
                   </div>
                   <Button
                     type="submit"
                     disabled={!prompt.trim() || isLoading}
-                    className="h-12 px-5 rounded-xl bg-gray-900 text-white font-semibold hover:bg-gray-800 disabled:opacity-50"
+                    className="h-12 px-5 rounded-xl"
                   >
                     {isLoading ? (
                       <Loader2 className="h-5 w-5 animate-spin" />
@@ -407,38 +390,38 @@ export default function PlanningPage() {
 
               {/* Error */}
               {error && (
-                <div className="mb-6 rounded-lg bg-red-50 p-4 text-red-600 text-sm">
+                <div className="mb-6 rounded-lg bg-red-50 dark:bg-red-900/50 p-4 text-red-600 dark:text-red-400 text-sm">
                   {error}
                 </div>
               )}
 
               {/* Image Space */}
-              <div className="rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 overflow-hidden">
+              <div className="rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 overflow-hidden">
                 {isLoading ? (
                   <div className="flex h-80 flex-col items-center justify-center gap-4">
                     <div className="relative">
-                      <div className="h-12 w-12 rounded-full border-4 border-gray-200"></div>
-                      <div className="absolute inset-0 h-12 w-12 rounded-full border-4 border-gray-900 border-t-transparent animate-spin"></div>
+                      <div className="h-12 w-12 rounded-full border-4 border-gray-200 dark:border-gray-700"></div>
+                      <div className="absolute inset-0 h-12 w-12 rounded-full border-4 border-gray-900 dark:border-gray-100 border-t-transparent animate-spin"></div>
                     </div>
-                    <p className="text-gray-500 font-medium">Generating your outfit...</p>
+                    <p className="text-gray-500 dark:text-gray-400 font-medium">Generating your outfit...</p>
                   </div>
                 ) : result ? (
                   <div>
                     <img
                       src={result.combined_image_url}
                       alt="Generated outfit"
-                      className="w-full h-auto max-h-96 object-contain bg-white"
+                      className="w-full h-auto max-h-96 object-contain bg-white dark:bg-gray-800"
                     />
                     {/* Selected Categories */}
-                    <div className="p-4 border-t border-gray-100 bg-white">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    <div className="p-4 border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800">
+                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
                         Selected Items
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {result.selected_categories.map((category) => (
                           <span
                             key={category}
-                            className="rounded-full bg-gray-900 px-3 py-1 text-xs font-medium text-white"
+                            className="rounded-full bg-gray-900 dark:bg-gray-100 px-3 py-1 text-xs font-medium text-white dark:text-gray-900"
                           >
                             {category}
                           </span>
@@ -447,7 +430,7 @@ export default function PlanningPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex h-80 flex-col items-center justify-center gap-3 text-gray-400">
+                  <div className="flex h-80 flex-col items-center justify-center gap-3 text-gray-400 dark:text-gray-500">
                     <FiCalendar size={48} />
                     <p className="text-sm">Your outfit will appear here</p>
                   </div>
@@ -462,7 +445,8 @@ export default function PlanningPage() {
                       setResult(null);
                       setPrompt("");
                     }}
-                    className="rounded-xl border border-gray-300 bg-white px-6 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    variant="outline"
+                    className="rounded-xl px-6 py-2"
                   >
                     Try Another Outfit
                   </Button>
@@ -470,7 +454,7 @@ export default function PlanningPage() {
                     <Button
                       onClick={handleSaveOutfit}
                       disabled={isSaving}
-                      className="rounded-xl bg-gray-900 px-6 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+                      className="rounded-xl px-6 py-2"
                     >
                       {isSaving ? (
                         <>
@@ -486,7 +470,7 @@ export default function PlanningPage() {
                     <Button
                       onClick={handleSaveOutfit}
                       disabled={isSaving}
-                      className="rounded-xl bg-gray-900 px-6 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+                      className="rounded-xl px-6 py-2"
                     >
                       {isSaving ? (
                         <>

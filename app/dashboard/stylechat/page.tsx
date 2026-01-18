@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
-import { FiSend } from "react-icons/fi";
+import { FiSend, FiMic } from "react-icons/fi";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type Message = {
   from: 'bot' | 'user';
@@ -43,7 +44,6 @@ export default function StyleChatPage() {
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    // Scroll to bottom when messages change
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
@@ -60,31 +60,41 @@ export default function StyleChatPage() {
   };
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-gray-50">
-      <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-        StyleChat
-      </h1>
-      <div className="mt-8 flex-1 overflow-y-auto">
-        <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4">
+    <div className="flex h-[calc(100vh-7rem)] flex-col overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
+      <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-6 py-4">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+          StyleChat
+        </h1>
+        <p className="mt-1 text-gray-500 dark:text-gray-400">
+          Your personal AI stylist. Ask anything about fashion.
+        </p>
+      </div>
+      <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-6">
+        <div className="mx-auto flex max-w-3xl flex-col gap-6">
           {messages.map((msg, i) => (
             <div
               key={i}
-              className={`flex ${
+              className={`flex items-start gap-3 ${
                 msg.from === "user" ? "justify-end" : "justify-start"
               }`}
             >
+              {msg.from === 'bot' && (
+                <Avatar className="w-8 h-8">
+                  <AvatarFallback>🤖</AvatarFallback>
+                </Avatar>
+              )}
               <div
                 className={`max-w-lg rounded-2xl px-4 py-3 shadow-sm ${
                   msg.from === "user"
-                    ? "rounded-br-none bg-gray-900 text-white"
-                    : "rounded-bl-none border border-gray-200 bg-white text-gray-800"
+                    ? "rounded-br-none bg-gray-900 text-white dark:bg-blue-600"
+                    : "rounded-bl-none border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
                 }`}
               >
-                <p className="text-sm">{msg.text}</p>
+                <p className="text-sm leading-relaxed">{msg.text}</p>
                 {msg.images && (
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     {msg.images.map((img, idx) => (
-                      <div key={idx} className="aspect-square bg-white rounded-lg overflow-hidden">
+                      <div key={idx} className="aspect-square bg-white dark:bg-gray-700 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600">
                         <img
                           src={img}
                           alt="outfit suggestion"
@@ -95,12 +105,17 @@ export default function StyleChatPage() {
                   </div>
                 )}
               </div>
+               {msg.from === 'user' && (
+                <Avatar className="w-8 h-8">
+                  <AvatarFallback>U</AvatarFallback>
+                </Avatar>
+              )}
             </div>
           ))}
           <div ref={messagesEndRef} />
         </div>
       </div>
-      <div className="border-t border-gray-200 bg-white px-4 py-3">
+      <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-6 py-4">
         <form
           onSubmit={handleSend}
           className="mx-auto flex max-w-3xl items-center gap-2"
@@ -110,11 +125,20 @@ export default function StyleChatPage() {
             placeholder="What should I wear today?"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            className="flex-1 rounded-full border-gray-300 bg-gray-100 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-900"
+            className="flex-1 rounded-full border-gray-300 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-white px-4 py-2 h-11 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-blue-500"
           />
+           <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            <FiMic className="h-5 w-5" />
+          </Button>
           <Button
             type="submit"
-            className="rounded-full bg-gray-900 p-2 text-white hover:bg-gray-800"
+            size="icon"
+            className="rounded-full bg-gray-900 dark:bg-blue-600 text-white hover:bg-gray-800 dark:hover:bg-blue-500"
           >
             <FiSend className="h-5 w-5" />
           </Button>

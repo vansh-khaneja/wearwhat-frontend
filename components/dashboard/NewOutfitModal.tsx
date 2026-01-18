@@ -1,7 +1,10 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import { wardrobeService } from "@/lib/api/wardrobe";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Upload, X, FileImage, Loader2 } from "lucide-react";
 
 export default function NewOutfitModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [images, setImages] = useState<File[]>([]);
@@ -9,33 +12,21 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
   const [uploadError, setUploadError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  if (!open) return null;
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const selected = Array.from(e.target.files);
-    setImages(prev => {
-      const total = prev.length + selected.length;
-      if (total > 9) {
-        return [...prev, ...selected.slice(0, 9 - prev.length)];
-      }
-      return [...prev, ...selected];
-    });
+    setImages((prev) => [...prev, ...selected].slice(0, 9));
     if (inputRef.current) inputRef.current.value = "";
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (images.length >= 9) return;
-    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    const files = Array.from(e.dataTransfer.files).filter((f) =>
+      f.type.startsWith("image/")
+    );
     if (files.length) {
-      setImages(prev => {
-        const total = prev.length + files.length;
-        if (total > 9) {
-          return [...prev, ...files.slice(0, 9 - prev.length)];
-        }
-        return [...prev, ...files];
-      });
+      setImages((prev) => [...prev, ...files].slice(0, 9));
     }
   };
 
@@ -61,284 +52,129 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
     }
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     if (!isUploading) {
       setImages([]);
       setUploadError("");
       onClose();
     }
+  }, [isUploading, onClose]);
+
+  const removeImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
+  if (!open) return null;
+
   return (
-    <div style={{
-      position: "fixed",
-      top: 0,
-      left: 0,
-      width: "100vw",
-      height: "100vh",
-      background: "rgba(0,0,0,0.10)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 100
-    }}>
-      <div style={{
-        background: "#fff",
-        borderRadius: 18,
-        minWidth: 800,
-        minHeight: 420,
-        maxWidth: '98vw',
-        fontFamily: 'Poppins, Arial, sans-serif',
-        color: '#222',
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'stretch',
-        justifyContent: 'center',
-        boxShadow: '0 8px 48px rgba(0,0,0,0.1)',
-        border: 'none',
-        padding: 0,
-      }}>
-        {/* Left: Upload UI */}
-        <div style={{
-          flex: 1,
-          padding: '40px 32px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 24,
-          alignItems: 'flex-start',
-          justifyContent: 'center',
-          borderRight: '1px solid #f0f0f0',
-          minWidth: 340,
-        }}>
-          <h2 style={{ fontFamily: 'Poppins, Arial, sans-serif', fontSize: 26, fontWeight: 700, marginBottom: 18, letterSpacing: 0.5 }}>Add Outfits</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="relative m-4 w-full max-w-4xl rounded-2xl bg-white dark:bg-gray-900 shadow-2xl">
+        <button
+          onClick={handleClose}
+          className="absolute -top-2 -right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+          aria-label="Close"
+        >
+          <X size={20} />
+        </button>
 
-          {/* Error Message */}
-          {uploadError && (
-            <div style={{
-              width: 320,
-              padding: '10px 14px',
-              background: '#fef2f2',
-              border: '1px solid #fecaca',
-              borderRadius: 8,
-              color: '#dc2626',
-              fontSize: 14,
-            }}>
-              {uploadError}
-            </div>
-          )}
+        <div className="flex flex-col md:flex-row">
+          {/* Left: Upload UI */}
+          <div className="flex flex-1 flex-col items-start justify-center gap-6 p-8 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+              Add New Items
+            </h2>
 
-          <div
-            style={{
-              width: 320,
-              minHeight: 160,
-              border: '2px dashed #1C1C1C',
-              borderRadius: 14,
-              background: '#f8fafd',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '24px 0',
-              marginBottom: 18,
-              position: 'relative',
-              cursor: images.length < 9 && !isUploading ? 'pointer' : 'not-allowed',
-              fontFamily: 'Poppins, Arial, sans-serif',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
-              transition: 'border 0.2s',
-              opacity: isUploading ? 0.6 : 1,
-            }}
-            onClick={() => {
-              if (images.length < 9 && !isUploading && inputRef.current) inputRef.current.click();
-            }}
-            onDragOver={e => e.preventDefault()}
-            onDrop={handleDrop}
-          >
-            <div style={{ fontSize: 32, color: '#1C1C1C', marginBottom: 0 }}>&uarr;</div>
-            <div style={{ fontSize: 18, color: '#222', fontWeight: 500, marginBottom: 2 }}>Drag and Drop files here</div>
-            <div style={{ color: '#888', fontSize: 15, marginBottom: 8 }}>or</div>
-            <button
-              type="button"
-              style={{
-                background: '#fff',
-                color: '#1C1C1C',
-                border: '2px solid #1C1C1C',
-                borderRadius: 8,
-                fontFamily: 'Poppins, Arial, sans-serif',
-                fontWeight: 600,
-                fontSize: 16,
-                padding: '6px 24px',
-                cursor: images.length < 9 && !isUploading ? 'pointer' : 'not-allowed',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-                marginBottom: 0,
-                outline: 'none',
-                transition: 'border 0.2s',
-              }}
-              onClick={e => {
-                e.stopPropagation();
-                if (images.length < 9 && !isUploading && inputRef.current) inputRef.current.click();
-              }}
-              disabled={images.length >= 9 || isUploading}
-            >Browse Files</button>
-            <input
-              ref={inputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-              disabled={images.length >= 9 || isUploading}
-            />
-          </div>
-          <div style={{ display: 'flex', gap: 16, marginTop: 8 }}>
-            <button
-              onClick={handleUpload}
-              style={{
-                background: '#1C1C1C',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 8,
-                fontFamily: 'Poppins, Arial, sans-serif',
-                fontWeight: 600,
-                fontSize: 16,
-                padding: '8px 24px',
-                cursor: images.length === 0 || isUploading ? 'not-allowed' : 'pointer',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-                outline: 'none',
-                marginRight: 0,
-                transition: 'background 0.2s',
-                opacity: images.length === 0 || isUploading ? 0.6 : 1,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-              }}
-              disabled={images.length === 0 || isUploading}
+            {uploadError && (
+              <Alert variant="destructive">
+                <AlertDescription>{uploadError}</AlertDescription>
+              </Alert>
+            )}
+
+            <div
+              className={`relative w-full cursor-pointer rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 p-8 text-center transition-colors hover:border-blue-500 dark:hover:border-blue-400 ${
+                isUploading ? "cursor-not-allowed opacity-60" : ""
+              }`}
+              onClick={() => !isUploading && inputRef.current?.click()}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={handleDrop}
             >
-              {isUploading && (
-                <span style={{
-                  width: 16,
-                  height: 16,
-                  border: '2px solid #fff',
-                  borderTopColor: 'transparent',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                }} />
-              )}
-              {isUploading ? 'Uploading...' : `Upload(${images.length})`}
-            </button>
-            <button
-              onClick={handleClose}
-              style={{
-                background: '#eee',
-                color: '#444',
-                border: 'none',
-                borderRadius: 8,
-                fontFamily: 'Poppins, Arial, sans-serif',
-                fontWeight: 500,
-                fontSize: 15,
-                padding: '8px 24px',
-                cursor: isUploading ? 'not-allowed' : 'pointer',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-                outline: 'none',
-                marginLeft: 0,
-                transition: 'background 0.2s',
-                opacity: isUploading ? 0.6 : 1,
-              }}
-              disabled={isUploading}
-            >cancel</button>
-          </div>
-        </div>
-        {/* Right: Image preview grid */}
-        <div style={{
-          flex: 1.2,
-          minWidth: 340,
-          background: '#fff',
-          borderRadius: '0 18px 18px 0',
-          border: 'none',
-          margin: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '40px 0',
-        }}>
-          {images.length === 0 ? (
-            <div style={{ color: '#bbb', fontSize: 16 }}>No images selected</div>
-          ) : (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
-              gap: 18,
-              width: '90%',
-              maxWidth: 380,
-              minHeight: 120,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-              {images.map((img, idx) => (
-                <div key={idx} style={{
-                  position: 'relative',
-                  width: 100,
-                  height: 100,
-                  borderRadius: 12,
-                  overflow: 'hidden',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
-                  border: '1.5px solid #e0e0e0',
-                  background: '#f8fafd',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                  <img
-                    src={URL.createObjectURL(img)}
-                    alt={`Selected ${idx + 1}`}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      borderRadius: 12,
-                    }}
-                  />
-                  {!isUploading && (
-                    <button
-                      onClick={() => setImages(prev => prev.filter((_, i) => i !== idx))}
-                      style={{
-                        position: 'absolute',
-                        top: 6,
-                        right: 6,
-                        background: 'rgba(255,255,255,0.85)',
-                        border: 'none',
-                        borderRadius: '50%',
-                        width: 24,
-                        height: 24,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-                        zIndex: 2
-                      }}
-                      title="Remove image"
-                    >
-                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" fill="#d00"/>
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              ))}
+              <div className="flex flex-col items-center justify-center gap-2 text-gray-500 dark:text-gray-400">
+                <Upload size={40} />
+                <span className="font-semibold text-gray-700 dark:text-gray-300">
+                  Drag & drop files here
+                </span>
+                <span className="text-sm">or click to browse</span>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                  Up to 9 images, PNG or JPG
+                </p>
+              </div>
+              <input
+                ref={inputRef}
+                type="file"
+                multiple
+                accept="image/png, image/jpeg"
+                className="hidden"
+                onChange={handleFileChange}
+                disabled={isUploading || images.length >= 9}
+              />
             </div>
-          )}
+
+            <div className="w-full">
+              <Button
+                onClick={handleUpload}
+                disabled={isUploading || images.length === 0}
+                className="w-full"
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  `Upload ${images.length} Item${images.length === 1 ? "" : "s"}`
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {/* Right: Image Preview */}
+          <div className="flex-1 p-8">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+              Selected Files ({images.length}/9)
+            </h3>
+            {images.length > 0 ? (
+              <div className="grid grid-cols-3 gap-4 overflow-y-auto max-h-[450px] pr-2">
+                {images.map((file, index) => (
+                  <div key={index} className="group relative aspect-square">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={`preview ${index}`}
+                      className="h-full w-full rounded-lg object-cover"
+                    />
+                    <div className="absolute inset-0 rounded-lg bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <button
+                        onClick={() => removeImage(index)}
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/40"
+                        aria-label="Remove image"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex h-full items-center justify-center rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
+                <div className="text-center text-gray-400 dark:text-gray-500">
+                  <FileImage size={48} className="mx-auto" />
+                  <p className="mt-2 font-medium">No files selected</p>
+                  <p className="text-sm">Your images will appear here.</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
-      {/* CSS for spinner animation */}
-      <style jsx>{`
-        @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
-        }
-      `}</style>
     </div>
   );
 }

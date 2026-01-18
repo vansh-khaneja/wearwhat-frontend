@@ -1,10 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Bookmark, SquarePen } from "lucide-react";
+import { Bookmark, SquarePen, Loader2, X } from "lucide-react";
 import { savedImagesService } from "@/lib/api";
 import type { SavedImage } from "@/lib/api/types";
-
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SavedPage() {
   const [savedImages, setSavedImages] = useState<SavedImage[]>([]);
@@ -31,18 +34,60 @@ export default function SavedPage() {
     fetchSavedImages();
   }, []);
 
+  const handleNoteSubmit = async (e: React.FormEvent, imgId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!noteInput.trim()) return;
+
+    setNoteLoading(true);
+    setNoteError("");
+    try {
+      await savedImagesService.updateNote({ saved_image_id: imgId, note: noteInput });
+      setSavedImages((prev) => prev.map((s) => s.id === imgId ? { ...s, note: noteInput } : s));
+      setEditingNoteId(null);
+      setNoteInput("");
+    } catch (err) {
+      setNoteError("Failed to save note");
+    } finally {
+      setNoteLoading(false);
+    }
+  };
+
+  const handleRemoveSaved = async (e: React.MouseEvent, imgId: string) => {
+    e.stopPropagation();
+    try {
+      await savedImagesService.delete(imgId);
+      setSavedImages((prev) => prev.filter((s) => s.id !== imgId));
+    } catch {
+      alert("Failed to remove saved image");
+    }
+  };
+
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+      <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
         Saved Outfits
       </h1>
+      <p className="mt-2 text-gray-500 dark:text-gray-400">
+        Your collection of favorite outfits and style inspirations.
+      </p>
       <div className="mt-8 flex-1 overflow-y-auto">
         {isLoading ? (
-          <div className="text-center text-gray-500 py-8">Loading...</div>
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            {Array.from({ length: 12 }).map((_, index) => (
+              <Skeleton key={index} className="aspect-square w-full rounded-lg" />
+            ))}
+          </div>
         ) : error ? (
-          <div className="text-center text-red-500 py-8">{error}</div>
+          <Alert variant="destructive">{error}</Alert>
         ) : savedImages.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">No saved outfits yet.</div>
+          <div className="flex flex-1 items-center justify-center text-center text-gray-500 dark:text-gray-400">
+            <div>
+              <Bookmark className="mx-auto h-12 w-12 text-gray-400" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No saved outfits</h3>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by saving outfits you like.</p>
+            </div>
+          </div>
         ) : (
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {savedImages.map((img) => (
@@ -50,7 +95,7 @@ export default function SavedPage() {
                 key={img.id}
                 className="group relative w-full cursor-pointer"
               >
-                <div className="aspect-square w-full overflow-hidden rounded-lg bg-white relative">
+                <div className="aspect-square w-full overflow-hidden rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative">
                   <img
                     src={img.image_url || (img.image_id.startsWith("http") ? img.image_id : `/outfits/${img.image_id}`)}
                     alt="saved outfit"
@@ -58,87 +103,69 @@ export default function SavedPage() {
                     onError={e => { e.currentTarget.src = '/placeholder.png'; }}
                   />
                   {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <div className="flex items-center gap-2 text-white w-full justify-center">
-                      {img.note ? (
-                        <span className="text-sm font-medium truncate max-w-[160px]" title={img.note}>{img.note}</span>
-                      ) : editingNoteId === img.id ? (
-                        <form
-                          className="flex items-center gap-2 w-full justify-center"
-                          onSubmit={async (e) => {
-                            e.preventDefault();
-                            setNoteLoading(true);
-                            setNoteError("");
-                            try {
-                              await savedImagesService.updateNote({ saved_image_id: img.id, note: noteInput });
-                              setSavedImages((prev) => prev.map((s) => s.id === img.id ? { ...s, note: noteInput } : s));
-                              setEditingNoteId(null);
-                              setNoteInput("");
-                            } catch (err) {
-                              setNoteError("Failed to save note");
-                            } finally {
-                              setNoteLoading(false);
-                            }
-                          }}
-                        >
-                          <input
-                            className="rounded px-2 py-1 text-black text-xs max-w-[120px]"
-                            value={noteInput}
-                            onChange={(e) => setNoteInput(e.target.value)}
-                            placeholder="Add note..."
-                            autoFocus
-                            maxLength={100}
-                            disabled={noteLoading}
-                          />
-                          <button
+                  <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-4 text-white">
+                    {editingNoteId === img.id ? (
+                      <form
+                        className="flex flex-col items-center gap-2 w-full"
+                        onSubmit={(e) => handleNoteSubmit(e, img.id)}
+                      >
+                        <Input
+                          className="h-8 text-black dark:text-white bg-gray-800/50 border-gray-600"
+                          value={noteInput}
+                          onChange={(e) => setNoteInput(e.target.value)}
+                          placeholder="Add a note..."
+                          autoFocus
+                          maxLength={100}
+                          disabled={noteLoading}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <div className="flex gap-2">
+                          <Button
                             type="submit"
-                            className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded"
+                            size="sm"
+                            className="h-7"
                             disabled={noteLoading || !noteInput.trim()}
                           >
-                            Save
-                          </button>
-                          <button
+                            {noteLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save"}
+                          </Button>
+                          <Button
                             type="button"
-                            className="ml-1 text-xs text-gray-300 hover:text-white"
-                            onClick={() => { setEditingNoteId(null); setNoteInput(""); }}
+                            size="sm"
+                            variant="ghost"
+                            className="h-7"
+                            onClick={(e) => { e.stopPropagation(); setEditingNoteId(null); setNoteInput(""); }}
                             disabled={noteLoading}
                           >
-                            Cancel
-                          </button>
-                        </form>
-                      ) : (
-                        <button
-                          className="flex items-center gap-2 text-white bg-transparent border-none outline-none"
-                          onClick={() => { setEditingNoteId(img.id); setNoteInput(""); }}
-                          tabIndex={0}
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        {noteError && <p className="text-xs text-red-400 mt-1">{noteError}</p>}
+                      </form>
+                    ) : (
+                      <>
+                        {img.note && <p className="text-sm font-medium text-center mb-2" title={img.note}>{img.note}</p>}
+                        <Button
+                          variant="outline"
+                          className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white"
+                          onClick={(e) => { e.stopPropagation(); setEditingNoteId(img.id); setNoteInput(img.note || ""); }}
                         >
-                          <SquarePen className="w-5 h-5" />
-                          <span className="text-sm font-medium">Add Note</span>
-                        </button>
-                      )}
-                    </div>
-                    {noteError && editingNoteId === img.id && (
-                      <div className="absolute bottom-2 left-0 right-0 text-center text-xs text-red-400">{noteError}</div>
+                          <SquarePen className="w-4 h-4 mr-2" />
+                          {img.note ? "Edit Note" : "Add Note"}
+                        </Button>
+                      </>
                     )}
                   </div>
                   {/* Save icon in top right */}
-                  <button
-                    className="absolute top-2 right-2 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-transparent border-none outline-none"
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="absolute top-1 right-1 text-white bg-black/30 hover:bg-black/50 h-8 w-8"
                     title="Remove from saved"
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      try {
-                        await savedImagesService.delete(img.id);
-                        setSavedImages((prev) => prev.filter((s) => s.id !== img.id));
-                      } catch {
-                        alert("Failed to remove saved image");
-                      }
-                    }}
+                    onClick={(e) => handleRemoveSaved(e, img.id)}
                   >
                     <Bookmark className="w-5 h-5" fill="white" />
-                  </button>
+                  </Button>
                 </div>
-                {/* Note is now only shown in the overlay above, not below the image */}
               </div>
             ))}
           </div>

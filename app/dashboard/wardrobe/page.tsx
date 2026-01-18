@@ -8,8 +8,8 @@ import type { WardrobeItem } from "@/lib/api/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { SquarePen } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { SquarePen, Plus } from "lucide-react";
 
 export default function WardrobePage() {
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -47,7 +47,6 @@ export default function WardrobePage() {
 
   const handleUploadClose = () => {
     setShowUploadModal(false);
-    // Refresh items after upload
     fetchItems();
   };
 
@@ -64,7 +63,6 @@ export default function WardrobePage() {
     });
   };
 
-  // Filter items based on search query
   const filteredItems = items.filter((item) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
@@ -87,81 +85,69 @@ export default function WardrobePage() {
         onDelete={handleDeleteItem}
       />
 
-      <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-        Wardrobe
-      </h1>
-
-      <div className="mt-8 flex items-center justify-between">
-        <p className="text-lg font-medium text-gray-600">
-          {isLoading ? "Loading..." : `${filteredItems.length} Items`}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+            Wardrobe
+          </h1>
+          <p className="mt-2 text-gray-500 dark:text-gray-400">
+            {isLoading ? "Loading items..." : `You have ${filteredItems.length} items in your wardrobe.`}
+          </p>
+        </div>
         <div className="flex items-center gap-4">
           <Input
             type="text"
             placeholder="Search items..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-64 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+            className="w-64 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm text-gray-800 dark:text-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-blue-500"
           />
           <Button
             onClick={() => setShowUploadModal(true)}
-            className="flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-gray-800"
+            className="flex items-center gap-2"
           >
-            <span className="text-lg font-bold">+</span>
-            <span>New Outfit</span>
+            <Plus className="h-4 w-4" />
+            <span>New Item</span>
           </Button>
         </div>
       </div>
 
-      {/* Error State */}
       {error && (
         <Alert variant="destructive" className="my-5">
           <AlertDescription className="flex items-center justify-between">
             {error}
-            <Button onClick={fetchItems}>
+            <Button onClick={fetchItems} variant="secondary">
               Retry
             </Button>
           </AlertDescription>
         </Alert>
       )}
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="mt-4 flex-1 overflow-y-auto">
+      <div className="mt-8 flex-1 overflow-y-auto">
+        {isLoading ? (
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {Array.from({ length: 12 }).map((_, index) => (
-              <div key={index} className="group relative">
-                <Skeleton className="aspect-square w-full rounded-lg" />
-              </div>
+              <Skeleton key={index} className="aspect-square w-full rounded-lg" />
             ))}
           </div>
-        </div>
-      )}
-
-      {/* Empty State */}
-      {!isLoading && !error && items.length === 0 && (
-        <div className="flex flex-1 items-center justify-center text-center text-gray-500">
-          <div>
-            <div className="mb-4 text-5xl">👕</div>
-            <h3 className="mb-2 text-xl font-semibold">
-              Your wardrobe is empty
-            </h3>
-            <p className="mb-6 text-sm text-gray-400">
-              Upload your first outfit to get started
-            </p>
-            <Button
-              onClick={() => setShowUploadModal(true)}
-              className="rounded-lg bg-gray-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-gray-800"
-            >
-              + Add Items
-            </Button>
+        ) : !error && items.length === 0 ? (
+          <div className="flex flex-1 items-center justify-center text-center">
+            <div className="flex flex-col items-center gap-4">
+              <div className="text-6xl">👕</div>
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                Your wardrobe is empty
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400">
+                Upload your first outfit to get started
+              </p>
+              <Button
+                onClick={() => setShowUploadModal(true)}
+              >
+                <Plus className="mr-2 h-4 w-4" /> Add Items
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
-
-      {/* Items Grid */}
-      {!isLoading && !error && filteredItems.length > 0 && (
-        <div className="mt-4 flex-1 overflow-y-auto">
+        ) : !error && filteredItems.length > 0 ? (
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {filteredItems.map((item) => (
               <div
@@ -169,22 +155,18 @@ export default function WardrobePage() {
                 className="group relative w-full cursor-pointer"
                 onClick={() => handleEditClick(item)}
               >
-                <div className="aspect-square w-full overflow-hidden rounded-lg bg-white relative">
+                <div className="aspect-square w-full overflow-hidden rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative">
                   <img
                     src={item.image_url}
                     alt={item.category}
                     className="h-full w-full object-contain object-center transition-transform duration-300 group-hover:scale-105"
                   />
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <div className="flex items-center gap-2 text-white">
-                      <SquarePen className="w-5 h-5" />
-                      <span className="text-sm font-medium">Edit</span>
-                    </div>
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-white">
+                    <SquarePen className="w-5 h-5 mr-2" />
+                    <span className="text-sm font-medium">Edit</span>
                   </div>
-                  {/* Date in bottom right */}
                   {item.created_at && (
-                    <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       {formatDate(item.created_at)}
                     </div>
                   )}
@@ -192,8 +174,15 @@ export default function WardrobePage() {
               </div>
             ))}
           </div>
-        </div>
-      )}
+        ) : (
+           <div className="flex flex-1 items-center justify-center text-center text-gray-500 dark:text-gray-400">
+            <div>
+              <h3 className="text-xl font-semibold">No items found</h3>
+              <p>Your search for &quot;{searchQuery}&quot; did not return any results.</p>
+            </div>
+          </div>
+        )}
+      </div>
     </main>
   );
 }
