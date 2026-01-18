@@ -22,6 +22,9 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "WearWhat - AI Wardrobe Assistant",
   description: "Your personal AI-powered wardrobe manager and styling assistant",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
