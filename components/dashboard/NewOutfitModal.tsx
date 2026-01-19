@@ -112,7 +112,7 @@ export default function NewOutfitModal({ open, onClose }: { open: boolean; onClo
                 ref={inputRef}
                 type="file"
                 multiple
-                accept="image/png, image/jpeg"
+                accept="image/png, image/jpeg, image/webp"
                 className="hidden"
                 onChange={handleFileChange}
                 disabled={isUploading || images.length >= 9}
