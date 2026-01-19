@@ -106,6 +106,14 @@ class ApiClient {
   async delete<T>(endpoint: string, options?: RequestInit): Promise<T> {
     return this.request<T>(endpoint, { ...options, method: 'DELETE' });
   }
+
+  async upload<T>(endpoint: string, formData: FormData, options?: RequestInit): Promise<T> {
+    return this.request<T>(endpoint, {
+      ...options,
+      method: 'POST',
+      body: formData,
+    });
+  }
 }
 
 // Export singleton instance

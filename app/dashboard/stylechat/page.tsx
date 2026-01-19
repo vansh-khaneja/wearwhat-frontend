@@ -2,9 +2,11 @@
 
 import React from "react";
 import { FiSend, FiMic } from "react-icons/fi";
+import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { chatService, type ChatMessage } from "@/lib/api/chat";
 
 type Message = {
   from: 'bot' | 'user';
@@ -12,51 +14,56 @@ type Message = {
   images?: string[];
 };
 
-const demoResponses: Message[] = [
-  {
-    from: 'bot',
-    text: "Based on today's weather (sunny, 22°C) and your wardrobe, here's a perfect casual outfit for you!",
-    images: ['/outfits/083b5947-291e-4f39-addf-f823019d22a0.jpg', '/outfits/23341bf6-c03a-410b-b6b8-e45468bcb73f.webp']
-  },
-  {
-    from: 'bot',
-    text: "For your meeting tomorrow, I'd suggest this professional yet comfortable look. It matches the cooler forecast!",
-    images: ['/outfits/3577a4f2-85a1-4fb6-927d-eb812645eaa1.webp']
-  },
-  {
-    from: 'bot',
-    text: "Great choice! This business casual combo works well for the office. The navy and white pair nicely together.",
-    images: ['/outfits/700437e7-ea90-426e-a344-4e2fd6a037ca.jpg', '/outfits/79c9112a-dc64-47e5-b777-da25425a148e.jpg']
-  },
-  {
-    from: 'bot',
-    text: "I noticed you haven't worn this in a while! It would be perfect for the weekend forecast - light rain expected.",
-    images: ['/outfits/b7357618-a6cd-4c61-b117-2b0fce2d583b.jpg']
-  },
-];
-
 export default function StyleChatPage() {
   const [messages, setMessages] = React.useState<Message[]>([
     { from: 'bot', text: "Hi! I'm your AI style assistant. Ask me for outfit suggestions based on weather, occasions, or just tell me what you're in the mood for today!" }
   ]);
   const [input, setInput] = React.useState('');
-  const [responseIndex, setResponseIndex] = React.useState(0);
+  const [isLoading, setIsLoading] = React.useState(false);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSend = (e?: React.FormEvent) => {
+  // Convert messages to chat history format for API
+  const getChatHistory = (): ChatMessage[] => {
+    return messages.map(msg => ({
+      role: msg.from === 'bot' ? 'assistant' : 'user',
+      content: msg.text,
+    }));
+  };
+
+  const handleSend = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!input.trim()) return;
-    setMessages(msgs => [...msgs, { from: 'user', text: input }]);
+    if (!input.trim() || isLoading) return;
+
+    const userMessage = input.trim();
+    setMessages(msgs => [...msgs, { from: 'user', text: userMessage }]);
     setInput('');
-    setTimeout(() => {
-      const response = demoResponses[responseIndex % demoResponses.length];
-      setMessages(msgs => [...msgs, response]);
-      setResponseIndex(i => i + 1);
-    }, 700);
+    setIsLoading(true);
+
+    try {
+      const history = getChatHistory();
+      const response = await chatService.sendMessage(userMessage, history);
+
+      if (response.success && response.response) {
+        setMessages(msgs => [...msgs, { from: 'bot', text: response.response }]);
+      } else {
+        setMessages(msgs => [...msgs, {
+          from: 'bot',
+          text: "Sorry, I couldn't process your request. Please try again."
+        }]);
+      }
+    } catch (error) {
+      console.error("Chat error:", error);
+      setMessages(msgs => [...msgs, {
+        from: 'bot',
+        text: "Sorry, something went wrong. Please try again later."
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -90,7 +97,7 @@ export default function StyleChatPage() {
                     : "rounded-bl-none border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
                 }`}
               >
-                <p className="text-sm leading-relaxed">{msg.text}</p>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.text}</p>
                 {msg.images && (
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     {msg.images.map((img, idx) => (
@@ -112,6 +119,20 @@ export default function StyleChatPage() {
               )}
             </div>
           ))}
+          {isLoading && (
+            <div className="flex items-start gap-3 justify-start">
+              <Avatar className="w-8 h-8">
+                <AvatarFallback>AI</AvatarFallback>
+              </Avatar>
+              <div className="rounded-2xl rounded-bl-none border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 shadow-sm">
+                <div className="flex items-center gap-1">
+                  <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                  <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                  <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                </div>
+              </div>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
       </div>
@@ -125,6 +146,7 @@ export default function StyleChatPage() {
             placeholder="What should I wear today?"
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            disabled={isLoading}
             className="flex-1 rounded-full border-gray-300 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-white px-4 py-2 h-11 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-blue-500"
           />
            <Button
@@ -138,9 +160,14 @@ export default function StyleChatPage() {
           <Button
             type="submit"
             size="icon"
-            className="rounded-full bg-gray-900 dark:bg-blue-600 text-white hover:bg-gray-800 dark:hover:bg-blue-500"
+            disabled={isLoading || !input.trim()}
+            className="rounded-full bg-gray-900 dark:bg-blue-600 text-white hover:bg-gray-800 dark:hover:bg-blue-500 disabled:opacity-50"
           >
-            <FiSend className="h-5 w-5" />
+            {isLoading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <FiSend className="h-5 w-5" />
+            )}
           </Button>
         </form>
       </div>

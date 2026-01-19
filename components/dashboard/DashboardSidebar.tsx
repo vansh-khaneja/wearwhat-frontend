@@ -1,17 +1,17 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FiGrid, FiScissors, FiCalendar, FiUsers, FiMessageCircle, FiBookmark } from "react-icons/fi";
+import { FiGrid, FiScissors, FiCalendar, FiUsers, FiMessageCircle, FiBookmark, FiUser } from "react-icons/fi";
 import { cn } from "@/lib/utils";
 
 const sidebarLinks = [
-    { name: "Dashboard", href: "/dashboard", icon: FiGrid },
     { name: "Wardrobe", href: "/dashboard/wardrobe", icon: FiGrid },
     { name: "Styling", href: "/dashboard/styling", icon: FiScissors },
     { name: "Planning", href: "/dashboard/planning", icon: FiCalendar },
     { name: "Community", href: "/dashboard/community", icon: FiUsers },
     { name: "StyleChat", href: "/dashboard/stylechat", icon: FiMessageCircle },
     { name: "Saved", href: "/dashboard/saved", icon: FiBookmark },
+    { name: "Profile", href: "/dashboard/profile", icon: FiUser },
 ];
 
 export default function DashboardSidebar() {

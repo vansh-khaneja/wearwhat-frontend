@@ -1,12 +1,13 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
 import { FiCalendar, FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import { X, Send, Loader2, Trash2 } from "lucide-react";
+import { X, Send, Loader2, Trash2, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { stylingService, type StylingRecommendationResponse } from "@/lib/api/styling";
 import { calendarOutfitsService, type CalendarOutfit } from "@/lib/api/calendarOutfits";
 import { cn } from "@/lib/utils";
+import PostOutfitModal from "@/components/dashboard/PostOutfitModal";
 
 interface DayData {
   day: string;
@@ -18,13 +19,13 @@ interface DayData {
   today?: boolean;
 }
 
-// Generate week data with proper dates
+// Generate 5 days data: 2 before today, today, and 2 after today
 function generateWeekData(): DayData[] {
   const today = new Date();
   const days: DayData[] = [];
 
-  // Start from 2 days ago
-  for (let i = -2; i <= 4; i++) {
+  // Start from 2 days ago to 2 days after (5 days total)
+  for (let i = -2; i <= 2; i++) {
     const date = new Date(today);
     date.setDate(today.getDate() + i);
 
@@ -36,10 +37,10 @@ function generateWeekData(): DayData[] {
     const dateStr = `${monthNames[date.getMonth()]} ${date.getDate()}`;
     const fullDate = date.toISOString().split('T')[0];
 
-    // Mock weather data
-    const temps = [20, 21, 22, 23, 24, 22, 19];
-    const lows = [10, 9, 10, 11, 12, 10, 8];
-    const icons = ["sunny", "sunny", "sunny", "sunny", "cloudy", "rainy", "sunny"];
+    // Mock weather data for 5 days
+    const temps = [20, 21, 22, 23, 24];
+    const lows = [10, 9, 10, 11, 12];
+    const icons = ["sunny", "sunny", "sunny", "cloudy", "sunny"];
 
     days.push({
       day: dayName,
@@ -75,6 +76,8 @@ export default function PlanningPage() {
   const [error, setError] = useState("");
   const [savedOutfits, setSavedOutfits] = useState<Record<string, CalendarOutfit>>({});
   const [loadingSavedOutfits, setLoadingSavedOutfits] = useState(true);
+  const [showPostModal, setShowPostModal] = useState(false);
+  const [postImageUrl, setPostImageUrl] = useState("");
 
   const idx = Math.max(1, Math.min(carouselIdx, week.length - 2));
   const visible = week.slice(idx - 1, idx + 2);
@@ -166,18 +169,8 @@ export default function PlanningPage() {
         items: result.items,
       });
 
-      // Update local state
-      setSavedOutfits((prev) => ({
-        ...prev,
-        [selectedDay.fullDate]: {
-          outfit_date: selectedDay.fullDate,
-          combined_image_url: result.combined_image_url,
-          prompt: prompt,
-          temperature: selectedDay.tempValue,
-          selected_categories: result.selected_categories,
-          items: result.items,
-        },
-      }));
+      // Refetch saved outfits to get complete data from server
+      await fetchSavedOutfits();
 
       handleCloseModal();
     } catch (err) {
@@ -215,6 +208,11 @@ export default function PlanningPage() {
   };
 
   const hasSavedOutfit = selectedDay ? !!savedOutfits[selectedDay.fullDate] : false;
+
+  const handlePostClick = (imageUrl: string) => {
+    setPostImageUrl(imageUrl);
+    setShowPostModal(true);
+  };
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -450,6 +448,14 @@ export default function PlanningPage() {
                   >
                     Try Another Outfit
                   </Button>
+                  <Button
+                    onClick={() => handlePostClick(result.combined_image_url)}
+                    variant="outline"
+                    className="rounded-xl px-6 py-2"
+                  >
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Post
+                  </Button>
                   {!hasSavedOutfit && (
                     <Button
                       onClick={handleSaveOutfit}
@@ -488,6 +494,13 @@ export default function PlanningPage() {
           </div>
         </div>
       )}
+
+      {/* Post Modal */}
+      <PostOutfitModal
+        open={showPostModal}
+        onClose={() => setShowPostModal(false)}
+        imageUrl={postImageUrl}
+      />
     </div>
   );
 }

@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { Send, Loader2, Bookmark } from "lucide-react";
+import { Send, Loader2, Bookmark, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { stylingService, type StylingRecommendationResponse } from "@/lib/api/styling";
 import { savedImagesService } from "@/lib/api";
+import PostOutfitModal from "@/components/dashboard/PostOutfitModal";
 
 export default function StylingPage() {
   const [prompt, setPrompt] = useState("");
@@ -13,6 +14,7 @@ export default function StylingPage() {
   const [error, setError] = useState("");
   const [result, setResult] = useState<StylingRecommendationResponse | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [showPostModal, setShowPostModal] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,19 +148,29 @@ export default function StylingPage() {
                 className="w-full max-h-[500px] object-contain bg-gray-50 dark:bg-gray-800/50"
               />
             </div>
-            <Button
-              onClick={handleSave}
-              disabled={isSaving}
-              variant="secondary"
-              className="absolute top-12 right-4 rounded-full"
-            >
-              {isSaving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Bookmark className="h-4 w-4" />
-              )}
-              <span className="ml-2">{isSaving ? "Saving..." : "Save"}</span>
-            </Button>
+            <div className="absolute top-12 right-4 flex gap-2">
+              <Button
+                onClick={() => setShowPostModal(true)}
+                variant="secondary"
+                className="rounded-full"
+              >
+                <Share2 className="h-4 w-4" />
+                <span className="ml-2">Post</span>
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={isSaving}
+                variant="secondary"
+                className="rounded-full"
+              >
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Bookmark className="h-4 w-4" />
+                )}
+                <span className="ml-2">{isSaving ? "Saving..." : "Save"}</span>
+              </Button>
+            </div>
           </div>
 
           {/* Selected Categories */}
@@ -224,6 +236,15 @@ export default function StylingPage() {
             </Button>
           </div>
         </div>
+      )}
+
+      {/* Post Modal */}
+      {result && (
+        <PostOutfitModal
+          open={showPostModal}
+          onClose={() => setShowPostModal(false)}
+          imageUrl={result.combined_image_url}
+        />
       )}
     </main>
   );
