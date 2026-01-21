@@ -101,8 +101,7 @@ export interface SavedImage {
 }
 
 export interface SaveImageRequest {
-  image_id: string;
-  note?: string;
+  image_url: string;
 }
 
 export interface SavedImageResponse {
@@ -114,11 +113,6 @@ export interface SavedImageResponse {
 }
 
 export type SavedImageListResponse = SavedImage[];
-
-export interface UpdateNoteRequest {
-  saved_image_id: string;
-  note: string;
-}
 
 export const CATEGORY_GROUPS = {
   upperWear: ['T-Shirt', 'Shirt', 'Blouse', 'Sweater', 'Hoodie', 'Cardigan', 'Tank Top', 'Crop Top', 'Polo', 'Tunic'],

@@ -3,15 +3,9 @@
  */
 
 import { apiClient } from './client';
-import type { SavedImage, SavedImageResponse, SavedImageListResponse, SaveImageRequest, UpdateNoteRequest } from './types';
+import type { SavedImageResponse, SavedImageListResponse, SaveImageRequest } from './types';
 
 export const savedImagesService = {
-    /**
-     * Delete a saved image by ID
-     */
-    async delete(savedImageId: string): Promise<{ success: boolean }> {
-      return apiClient.delete<{ success: boolean }>(`/saved-images/${savedImageId}`);
-    },
   /**
    * Save an image for the user
    */
@@ -27,9 +21,9 @@ export const savedImagesService = {
   },
 
   /**
-   * Update note for a saved image
+   * Delete a saved image by ID
    */
-  async updateNote(data: UpdateNoteRequest): Promise<SavedImageResponse> {
-    return apiClient.put<SavedImageResponse>('/saved-images/note', data);
+  async delete(savedImageId: string): Promise<{ success: boolean }> {
+    return apiClient.delete<{ success: boolean }>(`/saved-images/${savedImageId}`);
   },
 };

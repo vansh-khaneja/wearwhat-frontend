@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FiHeart, FiMessageCircle, FiMoreHorizontal, FiSend, FiBookmark } from "react-icons/fi";
 import { postsService, type Post } from "@/lib/api/posts";
+import { savedImagesService } from "@/lib/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CommentsModal from "@/components/dashboard/CommentsModal";
 import ShirtLoader from "@/components/ui/ShirtLoader";
@@ -33,6 +34,7 @@ function getInitials(name: string): string {
 
 export default function CommunityPage() {
   const [likingPostId, setLikingPostId] = useState<string | null>(null);
+  const [savingPostId, setSavingPostId] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const queryClient = useQueryClient();
 
@@ -83,6 +85,21 @@ export default function CommunityPage() {
           )
         : []
     );
+  };
+
+  const handleSavePost = async (post: Post) => {
+    if (savingPostId) return;
+
+    setSavingPostId(post.id);
+    try {
+      await savedImagesService.saveImage({
+        image_url: post.image_url,
+      });
+    } catch (err) {
+      console.error("Save error:", err);
+    } finally {
+      setSavingPostId(null);
+    }
   };
 
   return (
@@ -195,8 +212,16 @@ export default function CommunityPage() {
                         <FiSend className="w-6 h-6" />
                       </button>
                     </div>
-                    <button className="text-gray-700 dark:text-gray-300 hover:text-yellow-500 hover:scale-110 transition-all">
-                      <FiBookmark className="w-6 h-6" />
+                    <button
+                      onClick={() => handleSavePost(post)}
+                      disabled={savingPostId === post.id}
+                      className="text-gray-700 dark:text-gray-300 hover:text-yellow-500 hover:scale-110 transition-all disabled:opacity-50"
+                    >
+                      {savingPostId === post.id ? (
+                        <ShirtLoader size="sm" />
+                      ) : (
+                        <FiBookmark className="w-6 h-6" />
+                      )}
                     </button>
                   </div>
 

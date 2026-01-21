@@ -1,20 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bookmark, SquarePen, X } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import { savedImagesService } from "@/lib/api";
 import type { SavedImage } from "@/lib/api/types";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
 import ShirtLoader from "@/components/ui/ShirtLoader";
 
 export default function SavedPage() {
-  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
-  const [noteInput, setNoteInput] = useState("");
-  const [noteLoading, setNoteLoading] = useState(false);
-  const [noteError, setNoteError] = useState("");
   const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQuery({
@@ -26,27 +21,6 @@ export default function SavedPage() {
   });
 
   const savedImages = data ?? [];
-
-  const handleNoteSubmit = async (e: React.FormEvent, imgId: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!noteInput.trim()) return;
-
-    setNoteLoading(true);
-    setNoteError("");
-    try {
-      await savedImagesService.updateNote({ saved_image_id: imgId, note: noteInput });
-      queryClient.setQueryData<SavedImage[]>(["savedImages"], (oldData) =>
-        oldData ? oldData.map((s) => s.id === imgId ? { ...s, note: noteInput } : s) : []
-      );
-      setEditingNoteId(null);
-      setNoteInput("");
-    } catch {
-      setNoteError("Failed to save note");
-    } finally {
-      setNoteLoading(false);
-    }
-  };
 
   const handleRemoveSaved = async (e: React.MouseEvent, imgId: string) => {
     e.stopPropagation();
@@ -88,7 +62,7 @@ export default function SavedPage() {
             {savedImages.map((img) => (
               <div
                 key={img.id}
-                className="group relative w-full cursor-pointer"
+                className="group relative w-full"
               >
                 <div className="aspect-square w-full overflow-hidden rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 relative">
                   <img
@@ -97,64 +71,11 @@ export default function SavedPage() {
                     className="h-full w-full object-contain object-center transition-transform duration-300 group-hover:scale-105"
                     onError={e => { e.currentTarget.src = '/placeholder.png'; }}
                   />
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-4 text-white">
-                    {editingNoteId === img.id ? (
-                      <form
-                        className="flex flex-col items-center gap-2 w-full"
-                        onSubmit={(e) => handleNoteSubmit(e, img.id)}
-                      >
-                        <Input
-                          className="h-8 text-black dark:text-white bg-gray-800/50 border-gray-600"
-                          value={noteInput}
-                          onChange={(e) => setNoteInput(e.target.value)}
-                          placeholder="Add a note..."
-                          autoFocus
-                          maxLength={100}
-                          disabled={noteLoading}
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                        <div className="flex gap-2">
-                          <Button
-                            type="submit"
-                            size="sm"
-                            className="h-7"
-                            disabled={noteLoading || !noteInput.trim()}
-                          >
-                            {noteLoading ? <ShirtLoader size="sm" /> : "Save"}
-                          </Button>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="ghost"
-                            className="h-7"
-                            onClick={(e) => { e.stopPropagation(); setEditingNoteId(null); setNoteInput(""); }}
-                            disabled={noteLoading}
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                        {noteError && <p className="text-xs text-red-400 mt-1">{noteError}</p>}
-                      </form>
-                    ) : (
-                      <>
-                        {img.note && <p className="text-sm font-medium text-center mb-2" title={img.note}>{img.note}</p>}
-                        <Button
-                          variant="outline"
-                          className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white"
-                          onClick={(e) => { e.stopPropagation(); setEditingNoteId(img.id); setNoteInput(img.note || ""); }}
-                        >
-                          <SquarePen className="w-4 h-4 mr-2" />
-                          {img.note ? "Edit Note" : "Add Note"}
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                  {/* Save icon in top right */}
+                  {/* Remove button */}
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="absolute top-1 right-1 text-white bg-black/30 hover:bg-black/50 h-8 w-8"
+                    className="absolute top-2 right-2 text-white bg-black/30 hover:bg-black/50 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
                     title="Remove from saved"
                     onClick={(e) => handleRemoveSaved(e, img.id)}
                   >
